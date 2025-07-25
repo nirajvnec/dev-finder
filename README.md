@@ -1,3 +1,19 @@
+INSERT INTO [reference].[role] (
+    [role_name],
+    [description]
+)
+VALUES
+('PB-TR-VIEW',       'Treasury Risk Viewer'),
+('PB-MTRM-CREDIT',   'Credit Workspace Role'),
+('PB-MTRM-RATES',    'Rates Workspace Role'),
+('PB-MR-VIEW',       'Market Risk Viewer'),
+('PB-MTRM-EQUITIES', 'Equities Workspace Role'),
+('PB-MTRM-FX',       'FX Workspace Role');
+
+
+
+
+
 DELETE FROM [reference].[workspace]
 WHERE [workspace_key] > 12;
 
