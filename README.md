@@ -1,3 +1,12 @@
+INSERT INTO [reference].[role_prefix] (
+    [role_prefix]
+)
+VALUES
+('MIM_ABT-GWG_');
+
+
+
+
 INSERT INTO [reference].[workspace_role_mapping] ([workspace_key], [role_id])
 VALUES
 (
