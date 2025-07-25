@@ -1,3 +1,14 @@
+Hi Ram,
+
+For the QA environment, I’m currently checking with Rajeev. If there are separate workspaces available for QA, I’ll update you accordingly.
+
+For now, I’m sharing the details for Prod, Pre-Prod, and Dev environments.
+
+Let me know if you need anything else.
+
+
+
+
 
 Hi Rajeev,
 
