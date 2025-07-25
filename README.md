@@ -1,3 +1,13 @@
+
+INSERT INTO [reference].[report_type] (
+    [report_type_name]
+)
+VALUES
+('PBI'),
+('PG');
+
+
+
 INSERT INTO [reference].[role_prefix] (
     [role_prefix]
 )
