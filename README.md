@@ -1,3 +1,28 @@
+
+Hi Rajeev,
+
+Could you please share the Power BI workspace details in the following format:
+
+[Name] – [Workspace Link]
+
+For the below workspaces:
+
+Treasury Risk
+
+Credit Risk
+
+Market Risk
+
+Rates
+
+Equities
+
+FX
+
+
+
+
+
 Hi Ram,
 
 For the QA environment, I’m currently checking with Rajeev. If there are separate workspaces available for QA, I’ll update you accordingly.
