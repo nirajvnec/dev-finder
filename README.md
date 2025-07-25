@@ -1,4 +1,23 @@
 
+Hi Rajeev,
+
+As we now have the QA environment available, could you please share the corresponding Power BI workspace links for the following areas in QA?
+
+Treasury Risk
+
+Credit Risk
+
+Market Risk
+
+Rates
+
+Equities
+
+
+We already have the production links, so this would help us with QA validation and related activities.
+
+
+
 Subject:
 
 DDL & Insert Scripts for report_type and report_type_delivery_format Tables
