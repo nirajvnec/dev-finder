@@ -1,3 +1,32 @@
+
+Subject:
+
+DDL & Insert Scripts for report_type and report_type_delivery_format Tables
+
+
+---
+
+✅ Email Body:
+
+Hi Ram Gopal,
+
+These are the scripts I'm sharing that are currently available — we have created these in the DB. Just sharing them here so we can get them checked in eventually.
+
+Please get them reviewed with Pankaj first. If he finds everything is looking good, then you can proceed to check them into the SQLMI repository.
+
+Also, make sure to get the release version from Lukas before checking in.
+
+Let me know if anything needs to be updated.
+
+Thanks,
+Niraj
+
+
+---
+
+
+
+
 DELETE FROM [reference].[report_type_delivery_format];
 
 
