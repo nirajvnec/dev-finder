@@ -1,3 +1,8 @@
+DELETE FROM [reference].[workspace]
+WHERE [workspace_key] > 12;
+
+
+
 INSERT INTO [reference].[workspace] (
     [workspace_name],
     [workspace_guid],
