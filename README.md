@@ -1,3 +1,12 @@
+Hi Ram,
+
+I've added the script for the QA environment as well — it's highlighted in yellow for easy reference.
+Many thanks to Rajeev for his support.
+Please go ahead with the next steps
+
+
+
+
 Good that you reminded me—otherwise this would’ve ended up as a bug!
 
 
