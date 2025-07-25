@@ -1,3 +1,8 @@
+just tested it on my machine, and the uploaded_by column is coming as null for report ID 82. Looks like the development environment still has the old build. We may need to redeploy to Dev—doing that should sort out the issue.
+
+
+
+
 
 Hi Rajeev,
 
