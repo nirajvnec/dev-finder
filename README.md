@@ -1,3 +1,31 @@
+DECLARE @pbi_key INT, @pg_key INT;
+
+-- Get report_type_key for 'PBI' and 'PG'
+SELECT @pbi_key = report_type_key
+FROM [reference].[report_type]
+WHERE report_type_name = 'PBI';
+
+SELECT @pg_key = report_type_key
+FROM [reference].[report_type]
+WHERE report_type_name = 'PG';
+
+-- Insert for PBI (PDF, PPTX)
+INSERT INTO [reference].[report_type_delivery_format] (report_type_key, report_delivery_format_key)
+SELECT @pbi_key, report_delivery_format_key
+FROM [reference].[report_delivery_format]
+WHERE report_delivery_format_name IN ('PDF', 'PPTX');
+
+-- Insert for PG (all formats)
+INSERT INTO [reference].[report_type_delivery_format] (report_type_key, report_delivery_format_key)
+SELECT @pg_key, report_delivery_format_key
+FROM [reference].[report_delivery_format]
+WHERE report_delivery_format_name IN ('EXCEL', 'CSV', 'PDF', 'WORD', 'MHTML', 'PPTX');
+
+
+
+
+
+
 
 INSERT INTO [reference].[report_type] (
     [report_type_name]
