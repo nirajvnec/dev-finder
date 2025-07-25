@@ -1,3 +1,9 @@
+DELETE FROM [reference].[report_type_delivery_format];
+
+
+
+
+
 DECLARE @pbi_key INT, @pg_key INT;
 
 -- Get report_type_key for 'PBI' and 'PG'
