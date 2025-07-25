@@ -1,3 +1,37 @@
+INSERT INTO [reference].[workspace_role_mapping] ([workspace_key], [role_id])
+VALUES
+(
+    (SELECT workspace_key FROM [reference].[workspace] WHERE workspace_name = 'Treasury Risk'),
+    (SELECT role_id FROM [reference].[role] WHERE role_name = 'PB-TR-VIEW')
+),
+(
+    (SELECT workspace_key FROM [reference].[workspace] WHERE workspace_name = 'Credit'),
+    (SELECT role_id FROM [reference].[role] WHERE role_name = 'PB-MTRM-CREDIT')
+),
+(
+    (SELECT workspace_key FROM [reference].[workspace] WHERE workspace_name = 'Rates'),
+    (SELECT role_id FROM [reference].[role] WHERE role_name = 'PB-MTRM-RATES')
+),
+(
+    (SELECT workspace_key FROM [reference].[workspace] WHERE workspace_name = 'Market Risk'),
+    (SELECT role_id FROM [reference].[role] WHERE role_name = 'PB-MR-VIEW')
+),
+(
+    (SELECT workspace_key FROM [reference].[workspace] WHERE workspace_name = 'Equities'),
+    (SELECT role_id FROM [reference].[role] WHERE role_name = 'PB-MTRM-EQUITIES')
+),
+(
+    (SELECT workspace_key FROM [reference].[workspace] WHERE workspace_name = 'FX'),
+    (SELECT role_id FROM [reference].[role] WHERE role_name = 'PB-MTRM-FX')
+);
+
+
+
+
+
+
+
+
 INSERT INTO [reference].[role] (
     [role_name],
     [description]
