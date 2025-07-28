@@ -1,3 +1,52 @@
+using Marvel.Reference.Repositories.Entities;
+using Marvel.Reference.ServiceContract;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Marvel.Reference.Repositories
+{
+    public class ReportMetadataRepository : IReportMetadataRepository
+    {
+        private readonly ReferenceDbContext _dbContext;
+
+        public ReportMetadataRepository(ReferenceDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public async Task<ReportFileLocationResponse> GetReportFileLocationsAsync()
+        {
+            var items = await _dbContext.ReportSharedFolders.ToListAsync();
+
+            var grouped = items
+                .Where(x => x.ReportSharedFolderType != null)
+                .GroupBy(x => x.ReportSharedFolderType!)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => new ReportFileLocationItem
+                    {
+                        Name = x.ReportSharedFolderName,
+                        Type = x.ReportSharedFolderType
+                    }).ToList()
+                );
+
+            return new ReportFileLocationResponse
+            {
+                LocationsByReportType = grouped
+            };
+        }
+    }
+}
+
+
+
+
+
+
+
+
 using Marvel.Reference.ServiceContract;
 using System.Threading.Tasks;
 
