@@ -1,3 +1,13 @@
+public interface IReportMetadataService
+{
+    Task<IEnumerable<ReportFileLocationResponse>> GetReportFileLocationsAsync();
+}
+
+
+
+
+
+
 public class ReportFileLocationItem
 {
     public string DisplayText { get; set; } = string.Empty;
