@@ -1,3 +1,9 @@
+I haven’t had a chance to analyze these defects yet, as I believe they were previously assigned to Nancy. To be honest, I’m not fully aware of the background or current status at this point.
+
+
+
+
+
 Hi Ram,
 
 I've added the script for the QA environment as well — it's highlighted in yellow for easy reference.
