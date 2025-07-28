@@ -1,3 +1,22 @@
+using Marvel.Reference.ServiceContract;
+using System.Threading.Tasks;
+
+namespace Marvel.Reference.Repositories
+{
+    public interface IReportMetadataRepository
+    {
+        Task<ReportFileLocationResponse> GetReportFileLocationsAsync();
+    }
+}
+
+
+
+
+
+
+
+
+
 public DbSet<ReportSharedFolder> ReportSharedFolders { get; set; }
 
 
