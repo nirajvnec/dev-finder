@@ -1,3 +1,8 @@
+public DbSet<ReportSharedFolder> ReportSharedFolders { get; set; }
+
+
+
+
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
