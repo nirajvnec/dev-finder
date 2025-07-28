@@ -1,3 +1,14 @@
+I wanted to mention that I haven’t had a chance to analyze these defects yet, as I believe they were previously assigned to Nancy. To be honest, I’m not fully aware of the background or current status at this point.
+
+@Nancy – If you have any context or details regarding these bugs, could you please share them with us? That would be really helpful.
+
+
+
+
+
+
+
+
 I haven’t had a chance to analyze these defects yet, as I believe they were previously assigned to Nancy. To be honest, I’m not fully aware of the background or current status at this point.
 
 
