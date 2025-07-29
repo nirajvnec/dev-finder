@@ -1,3 +1,15 @@
+CREATE TABLE [reference].[mail_dl] (
+    [id] INT IDENTITY(1,1) NOT NULL,
+    [worker] VARCHAR(300) NULL,
+    [created_at] DATETIME NOT NULL DEFAULT GETDATE(),
+    [created_by] VARCHAR(100) NOT NULL DEFAULT 'system'
+);
+
+
+
+
+
+
 INSERT INTO [reference].[report_shared_folder] (
     [report_report_shared_folder_name],
     [report_report_shared_report_type],
