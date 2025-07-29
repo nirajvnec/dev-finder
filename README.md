@@ -1,3 +1,11 @@
+="INSERT INTO [reference].[mail_dl] ([mail_dl_name], [created_at], [created_by]) VALUES ('" & E2 & "', GETDATE(), 'system');"
+
+
+
+
+
+
+
 ="INSERT INTO [reference].[mail_dl] ([worker], [created_at], [created_by]) VALUES ('" & E2 & "', GETDATE(), 'system');"
 
 
