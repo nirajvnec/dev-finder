@@ -1,3 +1,7 @@
+="INSERT INTO [reference].[mail_dl] ([worker], [created_at], [created_by]) VALUES ('" & E2 & "', GETDATE(), 'system');"
+
+
+
 CREATE TABLE [reference].[mail_dl] (
     [id] INT IDENTITY(1,1) NOT NULL,
     [worker] VARCHAR(300) NULL,
