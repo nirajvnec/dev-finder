@@ -1,3 +1,17 @@
+INSERT INTO [reference].[report_shared_folder] (
+    [report_report_shared_folder_name],
+    [report_report_shared_report_type],
+    [created_at],
+    [created_by]
+)
+VALUES
+    ('mr-marvel-report-export', 'pbi', GETDATE(), 'system'),
+    ('mr-marvel-report-export', 'pg', GETDATE(), 'system');
+
+
+
+
+
 UPDATE [reference].[report_shared_folder]
 SET 
     [created_at] = GETDATE(),
