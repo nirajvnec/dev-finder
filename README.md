@@ -1,3 +1,22 @@
+CREATE TABLE [reference].[mail_dl] (
+    [mail_dl_key] INT IDENTITY(1,1) NOT NULL,
+    [mail_dl_name] NVARCHAR(255) NOT NULL,
+    [created_at] DATETIME NOT NULL DEFAULT GETDATE(),
+    [created_by] NVARCHAR(100) NOT NULL
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
 ="INSERT INTO [reference].[mail_dl] ([mail_dl_name], [created_at], [created_by]) VALUES ('" & E2 & "', GETDATE(), 'system');"
 
 
