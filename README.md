@@ -1,3 +1,16 @@
+INSERT INTO [reference].[report_report_shared_folder] (
+    [report_report_shared_folder_name],
+    [report_report_shared_report_type],
+    [created_at],
+    [created_by]
+)
+VALUES
+    ('mr-marvel-report-export', 'PBI', GETDATE(), 'system'),
+    ('mr-marvel-report-export', 'PPT', GETDATE(), 'system');
+
+
+
+
 CREATE TABLE [reference].[mail_dl] (
     [mail_dl_key] INT IDENTITY(1,1) NOT NULL,
     [mail_dl_name] NVARCHAR(255) NOT NULL,
