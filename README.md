@@ -1,3 +1,24 @@
+
+Hi Jaydeep,
+
+Could we connect regarding this JIRA ticket?
+
+As I understand it, if the SD Coefficient is not provided, the API should default the value to 1.
+Currently, it is being saved as NULL when no value is given.
+
+Please let me know if my understanding is incorrect.
+
+
+
+
+
+
+
+
+
+
+
+
 using Marvel.Reference.ServiceContract.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
