@@ -1,3 +1,36 @@
+
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Marvel.Reference.Entities
+{
+    [Table("mail_dl", Schema = "reference")]
+    public class MailDl
+    {
+        [Key]
+        [Column("mail_dl_key")]
+        public int MailDlKey { get; set; }
+
+        [Column("mail_dl_name")]
+        [Required]
+        [StringLength(255)]
+        public string MailDlName { get; set; } = string.Empty;
+
+        [Column("created_at")]
+        [Required]
+        public DateTime CreatedAt { get; set; }
+
+        [Column("created_by")]
+        [Required]
+        [StringLength(100)]
+        public string CreatedBy { get; set; } = string.Empty;
+    }
+}
+
+
+
+
 INSERT INTO [reference].[report_report_shared_folder] (
     [report_report_shared_folder_name],
     [report_report_shared_report_type],
