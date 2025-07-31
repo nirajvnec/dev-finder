@@ -1,3 +1,21 @@
+var query = context.MyReportsReadiness
+    .Where(x => DateOnly.FromDateTime(x.SomeDate) == date)
+    .GroupBy(r => r.Status)
+    .Select(g => new { Status = g.Key, Count = g.Count() });
+
+string sql = query.ToQueryString();
+Console.WriteLine(sql);  // Or log it
+
+var groupedCounts = await query.ToListAsync();
+
+
+
+
+
+
+
+
+
 
 using System;
 using System.ComponentModel.DataAnnotations;
