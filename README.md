@@ -1,3 +1,15 @@
+Add support for report summary filtered by cobDate
+
+- Updated controller to accept cobDate as query parameter
+- Modified service and repository layers to handle filtering by cobDate
+- Enabled SQL logging using ToQueryString for debugging
+
+
+
+
+
+
+
 var query = context.MyReportsReadiness
     .Where(x => DateOnly.FromDateTime(x.SomeDate) == date)
     .GroupBy(r => r.Status)
