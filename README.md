@@ -1,3 +1,22 @@
+
+const [reloadReportStatus, setReloadReportStatus] = useState(0);
+
+useEffect(() => {
+  const loadReportStatus = async () => {
+    // your existing logic here
+  };
+  loadReportStatus();
+}, [reloadReportStatus]);
+
+
+
+
+
+
+
+
+
+
 Add support for report summary filtered by cobDate
 
 - Updated controller to accept cobDate as query parameter
