@@ -18,3 +18,8 @@ interface EmailConfigProps {
   setReloadReportStatus: React.Dispatch<React.SetStateAction<number>>;
   // ...other props
 }
+
+
+
+rootContext?.showSuccess("Email sent successfully!");
+props.setReloadReportStatus(prev => prev + 1);
