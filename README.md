@@ -10,3 +10,11 @@ useEffect(() => {
 
 // Pass this setter function directly to EmailConfig
 <EmailConfig setReloadReportStatus={setReloadReportStatus} />
+
+
+
+
+interface EmailConfigProps {
+  setReloadReportStatus: React.Dispatch<React.SetStateAction<number>>;
+  // ...other props
+}
