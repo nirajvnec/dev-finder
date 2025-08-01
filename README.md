@@ -1,3 +1,9 @@
+const [refreshOnSuccessfulEmailSent, setRefreshOnSuccessfulEmailSent] = useState<...>(...);
+
+
+
+
+
 feat: added refresh logic for main grid and summary on successful email trigger
 
 
