@@ -1,69 +1,7 @@
-using System.Diagnostics;
+Hi Jaydeep,
 
-var baseDir = @"C:\UBS\Dev\mr-marvel-commentaryservice\SRC";
-var slnName = "MarvelCommentaryApi";
-var projects = new[]
-{
-    "Marvel.Commentary.APIHost",
-    "Marvel.Commentary.Repositories",
-    "Marvel.Commentary.RepositoriesContract",
-    "Marvel.Commentary.Services",
-    "Marvel.Commentary.ServicesContract",
-    "Marvel.Commentary.Shared"
-};
+Currently, when we do not set the SD Coefficient in the UI, the API saves it as zero. However, as per the JIRA , we want it to be saved as 1 when the user does not select any value.
 
-Console.WriteLine($"📁 Creating folder: {baseDir}");
-Directory.CreateDirectory(baseDir);
-Environment.CurrentDirectory = baseDir;
+I was thinking that instead of setting this default in the backend, it might be better to set it directly in the UI. This way, the user will see 1 as the default value and won't be surprised by the behavior if they leave it unchanged.
 
-// Create solution
-Run("dotnet", $"new sln -n {slnName}");
-
-// Create projects
-foreach (var proj in projects)
-{
-    var template = proj.Contains("APIHost") ? "webapi" : "classlib";
-    Run("dotnet", $"new {template} -n {proj}");
-}
-
-// Add projects to solution
-foreach (var proj in projects)
-{
-    var csprojPath = Path.Combine(proj, $"{proj}.csproj");
-    Run("dotnet", $"sln {slnName}.sln add {csprojPath}");
-}
-
-// Add project references (APIHost depends on all others)
-var apiHost = "Marvel.Commentary.APIHost";
-foreach (var proj in projects.Where(p => p != apiHost))
-{
-    Run("dotnet", $"add {apiHost} reference {proj}");
-}
-
-Console.WriteLine("\n✅ Done creating solution and projects at:");
-Console.WriteLine(baseDir);
-
-static void Run(string fileName, string args)
-{
-    Console.WriteLine($"> {fileName} {args}");
-
-    var process = new Process
-    {
-        StartInfo = new ProcessStartInfo
-        {
-            FileName = fileName,
-            Arguments = args,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false
-        }
-    };
-
-    process.OutputDataReceived += (s, e) => { if (e.Data != null) Console.WriteLine(e.Data); };
-    process.ErrorDataReceived += (s, e) => { if (e.Data != null) Console.Error.WriteLine(e.Data); };
-
-    process.Start();
-    process.BeginOutputReadLine();
-    process.BeginErrorReadLine();
-    process.WaitForExit();
-}
+Let me know your thoughts.
