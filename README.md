@@ -1,6 +1,11 @@
 fix/populate-approved-by-report-status
 
 
+fix: populate approvedBy, reportStatus, and reportStatusName in API response
+
+Previously, the API response was missing approvedBy and report status details.
+This commit ensures that approvedBy, reportStatus, and reportStatusName are correctly populated in the response.
+
 
 
 
