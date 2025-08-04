@@ -1,3 +1,22 @@
+
+{
+  "thresholdKey": 0,
+  "nodeLevel": 0,
+  "nodeLevelName": "UBS Group",
+  "nodeId": 0,
+  "nodeName": "UBS Group",
+  "comment": "Testing without createdAt",
+  "createdBy": "admin",
+  "thresholdValue": 1,
+  "standardDeviationCoeff": 0
+}
+
+
+
+
+
+
+
 {
   "thresholdKey": 0,
   "nodeLevel": 0,
