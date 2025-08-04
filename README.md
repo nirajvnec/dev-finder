@@ -1,16 +1,18 @@
-
 {
   "thresholdKey": 0,
   "nodeLevel": 0,
   "nodeLevelName": "UBS Group",
   "nodeId": 0,
   "nodeName": "UBS Group",
-  "comment": "Testing without createdAt",
-  "createdBy": "admin",
-  "thresholdValue": 1,
-  "standardDeviationCoeff": 0
+  "comment": "Test 141",
+  "createdBy": "",
+  "isOverrideAll": false,
+  "measureId": 20,
+  "measureName": "CVA (10 Day 99% ETL)",
+  "standardDeviation": 0,
+  "standardDeviationCoeff": 0,
+  "thresholdValue": 1
 }
-
 
 
 
