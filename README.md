@@ -1,3 +1,22 @@
+{
+  "thresholdKey": 0,
+  "nodeLevel": 0,
+  "nodeLevelName": "UBS Group",
+  "nodeId": 0,
+  "nodeName": "UBS Group",
+  "comment": "Test 141",
+  "createdAt": "2025-08-04T12:00:00Z",
+  "isOverrideAll": false,
+  "measureId": 20,
+  "measureName": "CVA (10 Day 99% ETL)",
+  "thresholdValue": 1,
+  "standardDeviation": 0,
+  "standardDeviationCoeff": 0
+}
+
+
+
+
 // Apply StandardDeviationCoeff default value if null or zero
 
 if ((threshold.StandardDeviationCoeff ?? 0) == 0)
