@@ -1,3 +1,5 @@
+// Apply StandardDeviationCoeff default value if null or zero
+
 if ((threshold.StandardDeviationCoeff ?? 0) == 0)
 {
     threshold.StandardDeviationCoeff = 1;
