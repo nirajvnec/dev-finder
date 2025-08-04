@@ -1,3 +1,15 @@
+var kernel = Kernel.CreateBuilder()
+    .AddAzureOpenAIChatCompletion(
+        deploymentName: "gpt-4",  // ✅ Use your actual deployment name here
+        endpoint: "https://your-endpoint-name.openai.azure.com/",  // 🔒 Replace with your actual endpoint
+        apiKey: "your-api-key-here")  // 🔒 Replace with your actual API key
+    .Build();
+
+
+
+
+
+
 fix/populate-approved-by-report-status
 
 
