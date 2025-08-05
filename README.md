@@ -1,3 +1,9 @@
+UPDATE [reference].[workspace]
+SET [workspace_alias_name] = [workspace_name]
+WHERE [workspace_key] IN (7, 8, 9, 10, 11, 12, 19);
+
+
+
 ALTER TABLE [reference].[workspace]
 ADD [workspace_alias_name] VARCHAR(200) NULL;
 
