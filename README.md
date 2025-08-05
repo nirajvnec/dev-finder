@@ -1,3 +1,44 @@
+
+const matchedThresholds = [];
+const unmatchedThresholds = [];
+
+thresholdData?.forEach((threshold) => {
+    const match = data.pvReportHierarchy?.find((hierarchy) => {
+        const thresholdNodeMatchesHierarchyNode = threshold.nodeid === hierarchy.nodeid;
+        return thresholdNodeMatchesHierarchyNode;
+    });
+
+    if (match) {
+        matchedThresholds.push({
+            thresholdNodeId: threshold.nodeid,
+            thresholdMeasureId: threshold.measureid,
+            matchedHierarchyNodeId: match.nodeid,
+            matchedHierarchyNodeName: match.nodename
+        });
+    } else {
+        unmatchedThresholds.push({
+            thresholdNodeId: threshold.nodeid,
+            thresholdMeasureId: threshold.measureid
+        });
+    }
+});
+
+// ✅ Log them
+console.log("✅ Matched Threshold Nodes:", matchedThresholds);
+console.log("❌ Unmatched Threshold Nodes:", unmatchedThresholds);
+
+
+
+
+
+
+
+
+
+
+
+
+
 const found = thresholdData?.some((t) => {
     const thresholdNodeMatchesHierarchyNode = t.nodeid === hierarchy.nodeid;
     return thresholdNodeMatchesHierarchyNode;
