@@ -1,29 +1,29 @@
-const matchedNodes = [];
-const unmatchedHierarchyNodes = [];
+const matchedNodes: any[] = [];
+const unmatchedHierarchyNodes: any[] = [];
 
 data.pvReportHierarchy?.forEach((hierarchy) => {
-    const match = thresholdData?.find((threshold) => {
-        const thresholdNodeMatchesHierarchyNode = threshold.nodeid === hierarchy.nodeid;
-        return thresholdNodeMatchesHierarchyNode;
-    });
+  const match = data.threshold?.find((threshold) => {
+    const thresholdNodeMatchesHierarchyNode = threshold.nodeid === hierarchy.nodeid;
+    return thresholdNodeMatchesHierarchyNode;
+  });
 
-    if (match) {
-        matchedNodes.push({
-            hierarchyNodeId: hierarchy.nodeid,
-            hierarchyNodeName: hierarchy.nodename,
-            thresholdNodeId: match.nodeid,
-            thresholdMeasureId: match.measureid
-        });
-    } else {
-        unmatchedHierarchyNodes.push({
-            hierarchyNodeId: hierarchy.nodeid,
-            hierarchyNodeName: hierarchy.nodename
-        });
-    }
+  if (match) {
+    matchedNodes.push({
+      hierarchyNodeId: hierarchy.nodeid,
+      hierarchyNodeName: hierarchy.nodename,
+      thresholdNodeId: match.nodeid,
+      thresholdMeasureId: match.measureid
+    });
+  } else {
+    unmatchedHierarchyNodes.push({
+      hierarchyNodeId: hierarchy.nodeid,
+      hierarchyNodeName: hierarchy.nodename
+    });
+  }
 });
 
-// ✅ Log matched nodes (both threshold and hierarchy info)
-console.log("✅ Matched Nodes (Hierarchy ↔ Threshold):", matchedNodes);
+console.log("✅ Matched Nodes (Hierarchy ↔ Threshold):");
+console.table(matchedNodes);
 
-// ❌ Log unmatched hierarchy nodes
-console.log("❌ Hierarchy Nodes without matching threshold:", unmatchedHierarchyNodes);
+console.log("❌ Hierarchy Nodes without matching threshold:");
+console.table(unmatchedHierarchyNodes);
