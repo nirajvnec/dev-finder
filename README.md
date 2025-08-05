@@ -1,3 +1,14 @@
+const found = thresholdData?.some((t) => {
+    const thresholdNodeMatchesHierarchyNode = t.nodeid === hierarchy.nodeid;
+    return thresholdNodeMatchesHierarchyNode;
+});
+
+
+
+
+
+
+
 UPDATE [reference].[workspace]
 SET [workspace_name] = 'MTRC-MR-DEV'
 WHERE [workspace_name] IN (
