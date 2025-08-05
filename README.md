@@ -1,3 +1,10 @@
+DELETE FROM [reference].[workspace]
+WHERE [workspace_key] >= 7;
+
+
+
+
+
 UPDATE [reference].[workspace]
 SET [workspace_alias_name] = [workspace_name]
 WHERE [workspace_key] IN (7, 8, 9, 10, 11, 12, 19);
