@@ -1,3 +1,15 @@
+UPDATE [reference].[workspace]
+SET [workspace_name] = 'MTRC-MR-DEV'
+WHERE [workspace_name] IN (
+    'Treasury Risk', 'Credit', 'Rates', 
+    'Market Risk', 'Equities', 'FX', 'Volcker'
+);
+
+
+
+
+
+
 DELETE FROM [reference].[workspace]
 WHERE [workspace_key] >= 7;
 
