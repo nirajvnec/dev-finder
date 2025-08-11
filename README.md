@@ -1,8 +1,2 @@
-WITH RankedGroups AS (
-  SELECT *,
-         ROW_NUMBER() OVER (PARTITION BY business_group_name ORDER BY business_group_id) AS rn
-  FROM [reference].[business_hierarchy]
-)
-SELECT *
-FROM RankedGroups
-WHERE rn = 1;
+INSERT INTO [config].[app_setting] ([component_name], [environment], [setting_key], [setting_value], [is_active])
+VALUES ('DataHubService', 'CRLocal', 'MarveLConfig:RollPrefix', 'MIM_ABT-GWG_', 1);
