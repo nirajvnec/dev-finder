@@ -1,4 +1,16 @@
 columnKeys.forEach((header, index) => {
+  const colLetter = String.fromCharCode(65 + index); // 65 is 'A' in ASCII, generates column letters (A, B, C, etc.)
+  ws[`${colLetter}1`] = {
+    v: header, // Set header value
+    t: 's', // Type 's' for string
+    c: [{ a: 'Author', t: `Note for ${header}` }] // Add a note/comment for the cell
+  };
+});
+
+
+
+
+columnKeys.forEach((header, index) => {
       const colLetter = String.fromCharCode(65 + index); // 65 is 'A' in ASCII
       ws[`${colLetter}1`] = { v: header, t: 's' }; // Set header value
     });
