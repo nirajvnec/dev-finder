@@ -38,11 +38,11 @@ BEGIN
         WHERE [component_name] = 'DataHubService' 
         AND [environment] = 'PREPROD' 
         AND [setting_key] = 'MarvelConfig:RolePrefix'
-        AND [setting_value] = 'MIM_ABT-GWN_'
+        AND [setting_value] = 'MIM_ABT-GWW_'
     )
     BEGIN
         INSERT INTO [config].[app_setting] ([component_name], [environment], [setting_key], [setting_value], [is_active])
-        VALUES ('DataHubService', 'PREPROD', 'MarvelConfig:RolePrefix', 'MIM_ABT-GWN_', 1);
+        VALUES ('DataHubService', 'PREPROD', 'MarvelConfig:RolePrefix', 'MIM_ABT-GWW_', 1);
     END
 END
 ELSE IF UPPER(@environment) = 'PROD'
