@@ -1,19 +1,62 @@
-function getExcelColumnName(columnNumber: number): string {
-        let columnName = '';
-        while (columnNumber >= 0) {
-          columnName = String.fromCharCode(65 + (columnNumber % 26)) + columnName;
-          columnNumber = Math.floor(columnNumber / 26) - 1;
-        }
-        return columnName || 'A'; // Default to 'A' if no valid column
-      }
+DECLARE @environment varchar(100) = $(Env);
 
-      // Dynamically generate column headers beyond Z1 with hidden notes
-      columnKeys.forEach((header, index) => {
-        const colLetter = getExcelColumnName(index); // Generates A, B, ..., Z, AA, AB, etc.
-        ws[`${colLetter}1`] = {
-          v: header, // Set header value
-          t: 's', // Type 's' for string
-          c: [{ a: 'Author', t: `Note for ${header}` }] // Comment added
-        };
-        ws[`${colLetter}1`].c.hidden = true; // Hides the comment, visible on hover (confirmed working)
-      });
+IF UPPER(@environment) = 'DEV'
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM [config].[app_setting] 
+        WHERE [component_name] = 'DataHubService' 
+        AND [environment] = 'DEV' 
+        AND [setting_key] = 'MarvelConfig:RolePrefix'
+        AND [setting_value] = 'MIM_ABT-GWG_'
+    )
+    BEGIN
+        INSERT INTO [config].[app_setting] ([component_name], [environment], [setting_key], [setting_value], [is_active])
+        VALUES ('DataHubService', 'DEV', 'MarvelConfig:RolePrefix', 'MIM_ABT-GWG_', 1);
+    END
+END
+ELSE IF UPPER(@environment) = 'TEST'
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM [config].[app_setting] 
+        WHERE [component_name] = 'DataHubService' 
+        AND [environment] = 'TEST' 
+        AND [setting_key] = 'MarvelConfig:RolePrefix'
+        AND [setting_value] = 'MIM_ABT-GWL_'
+    )
+    BEGIN
+        INSERT INTO [config].[app_setting] ([component_name], [environment], [setting_key], [setting_value], [is_active])
+        VALUES ('DataHubService', 'TEST', 'MarvelConfig:RolePrefix', 'MIM_ABT-GWL_', 1);
+    END
+END
+ELSE IF UPPER(@environment) = 'PREPROD'
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM [config].[app_setting] 
+        WHERE [component_name] = 'DataHubService' 
+        AND [environment] = 'PREPROD' 
+        AND [setting_key] = 'MarvelConfig:RolePrefix'
+        AND [setting_value] = 'MIM_ABT-GWN_'
+    )
+    BEGIN
+        INSERT INTO [config].[app_setting] ([component_name], [environment], [setting_key], [setting_value], [is_active])
+        VALUES ('DataHubService', 'PREPROD', 'MarvelConfig:RolePrefix', 'MIM_ABT-GWN_', 1);
+    END
+END
+ELSE IF UPPER(@environment) = 'PROD'
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM [config].[app_setting] 
+        WHERE [component_name] = 'DataHubService' 
+        AND [environment] = 'PROD' 
+        AND [setting_key] = 'MarvelConfig:RolePrefix'
+        AND [setting_value] = 'MIM_ABT-GWS_'
+    )
+    BEGIN
+        INSERT INTO [config].[app_setting] ([component_name], [environment], [setting_key], [setting_value], [is_active])
+        VALUES ('DataHubService', 'PROD', 'MarvelConfig:RolePrefix', 'MIM_ABT-GWS_', 1);
+    END
+END
