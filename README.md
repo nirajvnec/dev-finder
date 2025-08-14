@@ -1,2 +1,2 @@
-Hi Raj,
-I have a prior appointment with my doctor, so I’ll be away for some time. In case any issues come up related to the DB scripts, please reach out to Ram Gopal.
+Hi Manoj,
+Just to confirm — are we planning to deploy the DB objects in Marvel_25.8.2 again today?
