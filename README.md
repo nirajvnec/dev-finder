@@ -1,9 +1,9 @@
 # Make a backup branch (optional but safe)
-git checkout feature/Marvel_25.9.1-pbi-preview_functionality
-git checkout -b backup/Marvel_25.9.1-pbi-preview_functionality
+git checkout feature/Marvel_25.9.1-pbi-preview-functionality
+git checkout -b backup/Marvel_25.9.1-pbi-preview-functionality
 
 # Switch back to your feature branch
-git checkout feature/Marvel_25.9.1-pbi-preview_functionality
+git checkout feature/Marvel_25.9.1-pbi-preview-functionality
 
 # Fetch latest changes from remote
 git fetch origin
