@@ -1,19 +1,5 @@
-# Make a backup branch for safety
-git checkout feature/Marvel_25.9.1-pbi-preview-functionality
-git checkout -b backup/Marvel_25.9.1-pbi-preview-functionality
+Hi Pankaj,
 
-# Switch back to your feature branch
-git checkout feature/Marvel_25.9.1-pbi-preview-functionality
+During the deployment, the column workspace_alias_name is not getting added to the workspace table. Because of this, the other scripts dependent on this column are failing.
 
-# Fetch latest changes from remote
-git fetch origin
-
-# Rebase on top of updated feature/Marvel_25.9.1
-git rebase origin/feature/Marvel_25.9.1
-
-# If conflicts occur, fix them, then:
-# git add <file>
-# git rebase --continue
-
-# Push updated branch (after rebase history change)
-git push --force-with-lease
+I checked the script and the order looks fine to me, but I’m not sure what could be the root cause. Could you please check and update?
