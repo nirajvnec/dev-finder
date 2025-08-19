@@ -12,3 +12,5 @@ If a different registration or token setup is required, could you please guide m
 
 
 Right now, since I don’t know the correct way to authenticate, Docker defaults to pulling from Docker Hub, which is not what I want. I just need clarity on how to properly authenticate against the internal container registry so I can proceed with the build.
+
+Looking for your guidance on this.
