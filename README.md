@@ -1,9 +1,9 @@
-RuleFor(e => e.Subscription)
-    .NotNull()
-    .WithMessage("Each event must have a subscription.")
-    .ChildRules(subscription =>
-    {
-        subscription.RuleFor(s => s.SubscriptionName)
-            .NotEmpty()
-            .WithMessage("Subscription name is missing.");
-    });
+var workspaceNames = await context.WorkspaceRoleMappings
+    .Where(mapping => roleIds.Contains(mapping.RoleId))
+    .Select(mapping => new 
+    { 
+        mapping.WorkspaceKey, 
+        mapping.WorkspaceAliasName 
+    })
+    .Distinct()
+    .ToListAsync();
