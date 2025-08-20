@@ -7,3 +7,16 @@ var workspaceNames = await context.WorkspaceRoleMappings
     })
     .Distinct()
     .ToListAsync();
+
+
+
+List<WorkspaceResponse> workspaces = new();
+
+workspaceNames.Select((item, index) => new WorkspaceResponse
+{
+    DisplayValue = item.WorkspaceKey.ToString(),   // 👈 use WorkspaceKey here
+    DisplayText  = item.WorkspaceAliasName,
+    Index        = index + 1                       // optional if you need ordering
+})
+.ToList()
+.ForEach(response => workspaces.Add(response));
