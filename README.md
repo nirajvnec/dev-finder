@@ -21,3 +21,12 @@ function validateEmailSubscriptions(subscriptions: ReportSubscriptionModel[]): s
 
     return errors;
 }
+
+
+
+// Call the helper for email validations
+const emailErrors = validateEmailSubscriptions(data.reportSubscriptions);
+if (emailErrors.length > 0) {
+    newErrMessage.push(...emailErrors);
+    isValid = false;
+}
