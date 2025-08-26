@@ -1,3 +1,16 @@
+For any number of subscriptions, the system should display only unique validation messages.
+
+For example, if a user has selected multiple subscriptions where the delivery mode is Email, but has not filled in the Email To or Email CC fields, the messages should appear only once each, not repeated for every subscription.
+
+The validation messages should be:
+
+“Email To is required when delivery mode is Email.”
+
+“Email CC is required when delivery mode is Email.”
+
+
+
+
 
 async function isReportValidForSave(data: ReportRequestModel): Promise<boolean> {
     const newErrMessage: string[] = [];
