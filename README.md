@@ -1,22 +1,23 @@
-var workspaceNames = await context.WorkspaceRoleMappings
-    .Where(mapping => roleIds.Contains(mapping.RoleId))
-    .Select(mapping => new 
-    { 
-        mapping.WorkspaceKey, 
-        mapping.WorkspaceAliasName 
-    })
-    .Distinct()
-    .ToListAsync();
+function validateEmailSubscriptions(subscriptions: ReportSubscriptionModel[]): string[] {
+    let errors: string[] = [];
+    let emailToMissing = false;
+    let emailCcMissing = false;
 
+    if (!subscriptions || subscriptions.length === 0) return errors;
 
+    subscriptions.forEach(subscription => {
+        if (subscription.reportDeliveryModeKey === 2) { // Email delivery mode
+            if (!subscription.emailTo || subscription.emailTo.length === 0) {
+                emailToMissing = true;
+            }
+            if (!subscription.emailCc || subscription.emailCc.length === 0) {
+                emailCcMissing = true;
+            }
+        }
+    });
 
-List<WorkspaceResponse> workspaces = new();
+    if (emailToMissing) errors.push('Email To is required when delivery mode is Email.');
+    if (emailCcMissing) errors.push('Email CC is required when delivery mode is Email.');
 
-workspaceNames.Select((item, index) => new WorkspaceResponse
-{
-    DisplayValue = item.WorkspaceKey.ToString(),   // 👈 use WorkspaceKey here
-    DisplayText  = item.WorkspaceAliasName,
-    Index        = index + 1                       // optional if you need ordering
-})
-.ToList()
-.ForEach(response => workspaces.Add(response));
+    return errors;
+}
