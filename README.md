@@ -1,81 +1,23 @@
-For any number of subscriptions, the system should display only unique validation messages.
-
-For example, if a user has selected multiple subscriptions where the delivery mode is Email, but has not filled in the Email To or Email CC fields, the messages should appear only once each, not repeated for every subscription.
-
-The validation messages should be:
-
-“Email To is required when delivery mode is Email.”
-
-“Email CC is required when delivery mode is Email.”
-
-
-
-
-
-async function isReportValidForSave(data: ReportRequestModel): Promise<boolean> {
-    const newErrMessage: string[] = [];
-    let isValid = true;
-
-    // Existing validations...
-    if (reportNameValidationmsg(data.reportName)) {
-        newErrMessage.push(`Report Name: ${reportNameValidationmsg(data.reportName)}`);
-        isValid = false;
-    }
-
-    if (reportDescrpValidationmsg(data.reportDescription)) {
-        newErrMessage.push(`Report Description: ${reportDescrpValidationmsg(data.reportDescription)}`);
-        isValid = false;
-    }
-
-    if (data.reportDatasets.length === 0 && data.isPortfolioReport === false) {
-        newErrMessage.push('Select at least one dataset.');
-        isValid = false;
-    }
-
-    if (data.reportSubReports.length === 0 && data.isPortfolioReport === true) {
-        newErrMessage.push('Select at least one report.');
-        isValid = false;
-    }
-
-    // **Call the new helper for email validations**
-    const emailErrors = validateEmailSubscriptions(data.reportSubscriptions);
-    if (emailErrors.length > 0) {
-        newErrMessage.push(...emailErrors);
-        isValid = false;
-    }
-
-    if (!isValid) {
-        console.error('Validation errors:', newErrMessage);
-    }
-
-    return isValid;
-}
-
-
-
-
-
-
 function validateEmailSubscriptions(subscriptions: ReportSubscriptionModel[]): string[] {
-    let errors: string[] = [];
-    let emailToMissing = false;
-    let emailCcMissing = false;
+    const errors: string[] = [];
+    let missingRecipient = false;
 
     if (!subscriptions || subscriptions.length === 0) return errors;
 
     subscriptions.forEach(subscription => {
         if (subscription.reportDeliveryModeKey === 2) { // Email delivery mode
-            if (!subscription.emailTo || subscription.emailTo.length === 0) {
-                emailToMissing = true;
-            }
-            if (!subscription.emailCc || subscription.emailCc.length === 0) {
-                emailCcMissing = true;
+            const hasEmailTo = subscription.emailTo && subscription.emailTo.length > 0;
+            const hasEmailCc = subscription.emailCc && subscription.emailCc.length > 0;
+
+            if (!hasEmailTo && !hasEmailCc) {
+                missingRecipient = true;
             }
         }
     });
 
-    if (emailToMissing) errors.push('Email To is required when delivery mode is Email.');
-    if (emailCcMissing) errors.push('Email CC is required when delivery mode is Email.');
+    if (missingRecipient) {
+        errors.push('Select at least one email recipient.');
+    }
 
     return errors;
 }
