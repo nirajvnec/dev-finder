@@ -1,34 +1,24 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.tables t
+    JOIN sys.schemas s ON t.schema_id = s.schema_id
+    WHERE t.name = 'table_editor_column_metadata'
+      AND s.name = 'config'
+)
+BEGIN
+    CREATE TABLE [config].[table_editor_column_metadata](
+        [id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        [table_metadata_id] INT NOT NULL,   -- FK to table_editor_metadata
+        [column_name] NVARCHAR(200) NOT NULL,
+        [is_hidden_column] BIT NOT NULL CONSTRAINT DF_table_editor_column_metadata_is_hidden_column DEFAULT (0),
+        [is_hidden_in_edit_mode] BIT NOT NULL CONSTRAINT DF_table_editor_column_metadata_is_hidden_in_edit_mode DEFAULT (0),
+        [created_at] DATETIME2(3) NOT NULL CONSTRAINT DF_table_editor_column_metadata_created_at DEFAULT (sysutcdatetime()),
+        [updated_at] DATETIME2(3) NULL,
 
-namespace YourNamespace
-{
-    [Table("table_editor_metadata", Schema = "config")]
-    public class TableEditorMetadata
-    {
-        [Key]
-        [Column("id")]
-        public int Id { get; set; }
-
-        [Column("table_name")]
-        [Required]
-        [MaxLength(300)]
-        public string TableName { get; set; }
-
-        [Column("display_name")]
-        [MaxLength(200)]
-        public string? DisplayName { get; set; }
-
-        [Column("is_active")]
-        [Required]
-        public bool IsActive { get; set; }
-
-        [Column("created_at")]
-        [Required]
-        public DateTime CreatedAt { get; set; }
-
-        [Column("updated_at")]
-        public DateTime? UpdatedAt { get; set; }
-    }
-}
+        CONSTRAINT FK_table_editor_column_metadata_table
+            FOREIGN KEY (table_metadata_id) 
+            REFERENCES [config].[table_editor_metadata](id)
+            ON DELETE CASCADE
+    );
+END
+GO
