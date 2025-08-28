@@ -1,24 +1,59 @@
-IF NOT EXISTS (
-    SELECT 1
-    FROM sys.tables t
-    JOIN sys.schemas s ON t.schema_id = s.schema_id
-    WHERE t.name = 'table_editor_column_metadata'
-      AND s.name = 'config'
-)
-BEGIN
-    CREATE TABLE [config].[table_editor_column_metadata] (
-        [id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-        [table_editor_metadata_id] INT NOT NULL,
-        [column_name] NVARCHAR(200) NOT NULL,
-        [is_hidden_column] BIT NOT NULL DEFAULT (0),
-        [is_hidden_in_edit_mode] BIT NOT NULL DEFAULT (0),
-        [created_at] DATETIME2(3) NOT NULL DEFAULT (SYSUTCDATETIME()),
-        [updated_at] DATETIME2(3) NULL,
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-        CONSTRAINT FK_table_editor_column_metadata_table
-            FOREIGN KEY ([table_editor_metadata_id])
-            REFERENCES [config].[table_editor_metadata]([id])
-            ON DELETE CASCADE
-    );
-END;
-GO
+namespace Elections
+{
+    [Table("table_editor_metadata", Schema = "config")]
+    public class TableEditorMetadata
+    {
+        [Key]
+        [Column("id")]
+        public int Id { get; set; }
+
+        [Column("table_name")]
+        public string TableName { get; set; } = string.Empty;
+
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; }
+
+        [Column("updated_at")]
+        public DateTime? UpdatedAt { get; set; }
+
+        // 🔗 Navigation property (one-to-many)
+        public ICollection<TableEditorColumnMetadata> Columns { get; set; }
+            = new List<TableEditorColumnMetadata>();
+    }
+
+    [Table("table_editor_column_metadata", Schema = "config")]
+    public class TableEditorColumnMetadata
+    {
+        [Key]
+        [Column("id")]
+        public int Id { get; set; }
+
+        // FK column (must match SQL column)
+        [Column("table_metadata_id")]
+        public int TableEditorMetadataId { get; set; }
+
+        [Column("column_name")]
+        public string ColumnName { get; set; } = string.Empty;
+
+        [Column("is_hidden_in_ui")]
+        public bool IsHiddenInUi { get; set; }
+
+        [Column("is_hidden_in_edit_model")]
+        public bool IsHiddenInEditModel { get; set; }
+
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; }
+
+        [Column("updated_at")]
+        public DateTime? UpdatedAt { get; set; }
+
+        // 🔗 Navigation (many-to-one)
+        [ForeignKey(nameof(TableEditorMetadataId))]
+        public TableEditorMetadata? TableEditorMetadata { get; set; }
+    }
+}
