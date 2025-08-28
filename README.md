@@ -1,30 +1,43 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using YourNamespace.Models;
+-- Create schema if it does not exist
+IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'config')
+BEGIN
+    EXEC('CREATE SCHEMA config;');
+END
+GO
 
-namespace YourNamespace.Repositories
-{
-    public interface ITableEditorRepository
-    {
-        // Get list of all table names
-        Task<IEnumerable<TableEditorTableNames>> GetTableNamesAsync();
+-- Create table if it does not exist
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.tables t
+    INNER JOIN sys.schemas s ON t.schema_id = s.schema_id
+    WHERE t.name = 'table_editor_metadata'
+      AND s.name = 'config'
+)
+BEGIN
+    CREATE TABLE config.table_editor_metadata
+    (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        table_name NVARCHAR(300) NOT NULL,   -- schema-qualified name (e.g., "reference.mail_dl")
+        display_name NVARCHAR(200) NULL,     -- friendly name for UI
+        is_active BIT NOT NULL DEFAULT 1,    -- visibility flag
+        created_at DATETIME2(3) NOT NULL DEFAULT SYSUTCDATETIME(),
+        updated_at DATETIME2(3) NULL
+    );
 
-        // Get schema (columns info) for a table
-        Task<IEnumerable<TableEditorColumnsInfo>> GetTableSchemaByTableNameAsync(string tableName);
+    -- Optional: prevent duplicates
+    CREATE UNIQUE INDEX UX_table_editor_metadata_table_name
+        ON config.table_editor_metadata (table_name);
+END
+GO
 
-        // Get table data by table name
-        Task<IEnumerable<TableEditorDataRow>> GetTableDataByTableNameAsync(string tableName);
-
-        // Create a new row in a table
-        Task<bool> CreateRowAsync(string tableName, Dictionary<string, object?> rowData);
-
-        // Edit/update an existing row
-        Task<bool> EditRowAsync(string tableName, Dictionary<string, object?> rowData);
-
-        // Delete a row
-        Task<bool> DeleteRowAsync(string tableName, Dictionary<string, object?> keyData);
-
-        // Save all changes in bulk (create, update, delete)
-        Task<bool> SaveAllAsync(string tableName, IEnumerable<Dictionary<string, object?>> rowsData);
-    }
-}
+-- Insert single seed record for reference.mail_dl if it does not exist
+IF NOT EXISTS (
+    SELECT 1 
+    FROM config.table_editor_metadata
+    WHERE table_name = 'reference.mail_dl'
+)
+BEGIN
+    INSERT INTO config.table_editor_metadata (table_name, display_name)
+    VALUES ('reference.mail_dl', 'Mail DL Table');
+END
+GO
