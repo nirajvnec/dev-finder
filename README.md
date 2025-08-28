@@ -1,75 +1,18 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+DROP TABLE [config].[table_editor_column_metadata];
+GO
 
-[Table("table_editor_column_metadata", Schema = "config")]
-public class TableEditorColumnMetadata
-{
-    [Key]
-    [Column("id")]
-    public int Id { get; set; }
+CREATE TABLE [config].[table_editor_column_metadata] (
+    [id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    [table_editor_metadata_id] INT NOT NULL,   -- ✅ corrected column name
+    [column_name] NVARCHAR(200) NOT NULL,
+    [is_hidden_column] BIT NOT NULL DEFAULT (0),
+    [is_added_in_edit_model] BIT NOT NULL DEFAULT (0),
+    [created_at] DATETIME2(3) NOT NULL DEFAULT (SYSUTCDATETIME()),
+    [updated_at] DATETIME2(3) NULL DEFAULT (SYSUTCDATETIME()),
 
-    [Required]
-    [Column("table_id")]
-    public int TableId { get; set; }
-
-    [Required]
-    [MaxLength(200)]
-    [Column("column_name")]
-    public string ColumnName { get; set; }
-
-    [MaxLength(200)]
-    [Column("display_name")]
-    public string DisplayName { get; set; }
-
-    [Required]
-    [Column("is_active")]
-    public bool IsActive { get; set; }
-
-    [Column("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [Column("updated_at")]
-    public DateTime UpdatedAt { get; set; }
-
-    // 🔗 Navigation property - each column belongs to one table
-    [ForeignKey("TableId")]
-    public TableEditorMetadata Table { get; set; }
-}
-
-
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-[Table("table_editor_metadata", Schema = "config")]
-public class TableEditorMetadata
-{
-    [Key]
-    [Column("id")]
-    public int Id { get; set; }
-
-    [Required]
-    [MaxLength(300)]
-    [Column("table_name")]
-    public string TableName { get; set; }
-
-    [MaxLength(200)]
-    [Column("display_name")]
-    public string DisplayName { get; set; }
-
-    [Required]
-    [Column("is_active")]
-    public bool IsActive { get; set; }
-
-    [Column("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [Column("updated_at")]
-    public DateTime UpdatedAt { get; set; }
-
-    // 🔗 Navigation property - One table has many columns
-    public ICollection<TableEditorColumnMetadata> Columns { get; set; }
-}
+    CONSTRAINT FK_table_editor_column_metadata_table
+        FOREIGN KEY ([table_editor_metadata_id])
+        REFERENCES [config].[table_editor_metadata]([id])
+        ON DELETE CASCADE
+);
+GO
