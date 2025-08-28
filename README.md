@@ -1,48 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using YourNamespace.Entities;
-
-namespace YourNamespace.Data
+protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
-    public class AppDbContext : DbContext
-    {
-        public DbSet<TableEditorMetadata> TableEditorMetadata { get; set; }
-        public DbSet<TableEditorColumnMetadata> TableEditorColumnMetadata { get; set; }
+    modelBuilder.Entity<TableEditorColumnMetadata>()
+        .HasOne(c => c.TableEditorMetadata)
+        .WithMany(p => p.Columns)
+        .HasForeignKey(c => c.TableEditorMetadataId)
+        .OnDelete(DeleteBehavior.Cascade);
 
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // 🟢 Parent entity
-            modelBuilder.Entity<TableEditorMetadata>(entity =>
-            {
-                entity.ToTable("table_editor_metadata", "config");
-
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.TableName)
-                      .HasMaxLength(200)
-                      .IsRequired();
-            });
-
-            // 🟢 Child entity
-            modelBuilder.Entity<TableEditorColumnMetadata>(entity =>
-            {
-                entity.ToTable("table_editor_column_metadata", "config");
-
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.ColumnName)
-                      .HasMaxLength(200)
-                      .IsRequired();
-
-                // ⚡ Relationship mapping
-                entity.HasOne(d => d.TableEditorMetadata)
-                      .WithMany(p => p.Columns)
-                      .HasForeignKey(d => d.TableEditorMetadataId)
-                      .OnDelete(DeleteBehavior.Cascade);  // matches your SQL "ON DELETE CASCADE"
-            });
-        }
-    }
+    // Always call base!
+    base.OnModelCreating(modelBuilder);
 }
