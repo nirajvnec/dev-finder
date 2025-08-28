@@ -25,3 +25,14 @@ namespace YourNamespace.Models
         public bool? IsHiddenColumn { get; set; }   // optional
     }
 }
+
+
+
+namespace YourNamespace.Models
+{
+    public class TableEditorTableNames
+    {
+        public string Name { get; set; } = string.Empty;
+        public string? DisplayName { get; set; } // optional
+    }
+}
