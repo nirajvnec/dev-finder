@@ -1,8 +1,9 @@
+using System.Collections.Generic;
+
 namespace YourNamespace.Models
 {
-    public class TableEditorTableNames
+    public class TableEditorDataRow
     {
-        public string TableName { get; set; }
-        public string DisplayName { get; set; }
+        public Dictionary<string, object?> Data { get; set; } = new();
     }
 }
