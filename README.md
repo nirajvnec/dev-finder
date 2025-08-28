@@ -1,59 +1,48 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using YourNamespace.Entities;
 
-namespace Elections
+namespace YourNamespace.Data
 {
-    [Table("table_editor_metadata", Schema = "config")]
-    public class TableEditorMetadata
+    public class AppDbContext : DbContext
     {
-        [Key]
-        [Column("id")]
-        public int Id { get; set; }
+        public DbSet<TableEditorMetadata> TableEditorMetadata { get; set; }
+        public DbSet<TableEditorColumnMetadata> TableEditorColumnMetadata { get; set; }
 
-        [Column("table_name")]
-        public string TableName { get; set; } = string.Empty;
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+        }
 
-        [Column("created_at")]
-        public DateTime CreatedAt { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // 🟢 Parent entity
+            modelBuilder.Entity<TableEditorMetadata>(entity =>
+            {
+                entity.ToTable("table_editor_metadata", "config");
 
-        [Column("updated_at")]
-        public DateTime? UpdatedAt { get; set; }
+                entity.HasKey(e => e.Id);
 
-        // 🔗 Navigation property (one-to-many)
-        public ICollection<TableEditorColumnMetadata> Columns { get; set; }
-            = new List<TableEditorColumnMetadata>();
-    }
+                entity.Property(e => e.TableName)
+                      .HasMaxLength(200)
+                      .IsRequired();
+            });
 
-    [Table("table_editor_column_metadata", Schema = "config")]
-    public class TableEditorColumnMetadata
-    {
-        [Key]
-        [Column("id")]
-        public int Id { get; set; }
+            // 🟢 Child entity
+            modelBuilder.Entity<TableEditorColumnMetadata>(entity =>
+            {
+                entity.ToTable("table_editor_column_metadata", "config");
 
-        // FK column (must match SQL column)
-        [Column("table_metadata_id")]
-        public int TableEditorMetadataId { get; set; }
+                entity.HasKey(e => e.Id);
 
-        [Column("column_name")]
-        public string ColumnName { get; set; } = string.Empty;
+                entity.Property(e => e.ColumnName)
+                      .HasMaxLength(200)
+                      .IsRequired();
 
-        [Column("is_hidden_in_ui")]
-        public bool IsHiddenInUi { get; set; }
-
-        [Column("is_hidden_in_edit_model")]
-        public bool IsHiddenInEditModel { get; set; }
-
-        [Column("created_at")]
-        public DateTime CreatedAt { get; set; }
-
-        [Column("updated_at")]
-        public DateTime? UpdatedAt { get; set; }
-
-        // 🔗 Navigation (many-to-one)
-        [ForeignKey(nameof(TableEditorMetadataId))]
-        public TableEditorMetadata? TableEditorMetadata { get; set; }
+                // ⚡ Relationship mapping
+                entity.HasOne(d => d.TableEditorMetadata)
+                      .WithMany(p => p.Columns)
+                      .HasForeignKey(d => d.TableEditorMetadataId)
+                      .OnDelete(DeleteBehavior.Cascade);  // matches your SQL "ON DELETE CASCADE"
+            });
+        }
     }
 }
