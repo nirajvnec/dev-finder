@@ -10,9 +10,9 @@ BEGIN
         [id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
         [table_metadata_id] INT NOT NULL,   -- FK to table_editor_metadata
         [column_name] NVARCHAR(200) NOT NULL,
-        [is_hidden_column] BIT NOT NULL CONSTRAINT DF_table_editor_column_metadata_is_hidden_column DEFAULT (0),
-        [is_hidden_in_edit_mode] BIT NOT NULL CONSTRAINT DF_table_editor_column_metadata_is_hidden_in_edit_mode DEFAULT (0),
-        [created_at] DATETIME2(3) NOT NULL CONSTRAINT DF_table_editor_column_metadata_created_at DEFAULT (sysutcdatetime()),
+        [is_hidden_column] BIT NOT NULL DEFAULT (0),
+        [is_hidden_in_edit_mode] BIT NOT NULL DEFAULT (0),
+        [created_at] DATETIME2(3) NOT NULL DEFAULT (sysutcdatetime()),
         [updated_at] DATETIME2(3) NULL,
 
         CONSTRAINT FK_table_editor_column_metadata_table
