@@ -1,10 +1,3 @@
--- Create schema if it does not exist
-IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'config')
-BEGIN
-    EXEC('CREATE SCHEMA config;');
-END
-GO
-
 -- Create table if it does not exist
 IF NOT EXISTS (
     SELECT 1
@@ -23,14 +16,10 @@ BEGIN
         created_at DATETIME2(3) NOT NULL DEFAULT SYSUTCDATETIME(),
         updated_at DATETIME2(3) NULL
     );
-
-    -- Optional: prevent duplicates
-    CREATE UNIQUE INDEX UX_table_editor_metadata_table_name
-        ON config.table_editor_metadata (table_name);
 END
 GO
 
--- Insert single seed record for reference.mail_dl if it does not exist
+-- Insert seed record for reference.mail_dl if it doesn't exist
 IF NOT EXISTS (
     SELECT 1 
     FROM config.table_editor_metadata
