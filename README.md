@@ -1,40 +1,34 @@
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System.Data.Common;
 
-[ApiController]
-[Route("api/[controller]")]
-public class TableDataController : ControllerBase
+public static class DbSchemaExtensions
 {
-    private readonly ITableEditorRepository _repository;
-
-    public TableDataController(ITableEditorRepository repository)
-    {
-        _repository = repository;
-    }
-
     /// <summary>
-    /// Get all rows from a given table (schema.table format).
-    /// Example: GET /api/tabledata/tableColumnData/reference.mail_dl
+    /// Checks whether a given schema.table exists in the database.
     /// </summary>
-    [HttpGet("tableColumnData/{tableName}")]
-    public async Task<IActionResult> GetTableColumnData(string tableName)
+    public static async Task<bool> TableExistsAsync(this DbContext context, string schema, string tableName)
     {
-        try
-        {
-            var data = await _repository.GetTableDataByTableNameAsync(tableName);
+        await using var connection = context.Database.GetDbConnection();
+        await connection.OpenAsync();
 
-            if (data == null || !data.Any())
-                return NotFound($"No data found in table {tableName}");
+        await using var command = connection.CreateCommand();
+        command.CommandText = @"
+            SELECT COUNT(*) 
+            FROM INFORMATION_SCHEMA.TABLES 
+            WHERE TABLE_SCHEMA = @schema AND TABLE_NAME = @table";
+        
+        var schemaParam = command.CreateParameter();
+        schemaParam.ParameterName = "@schema";
+        schemaParam.Value = schema;
+        command.Parameters.Add(schemaParam);
 
-            return Ok(data);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            // Ideally log exception
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
+        var tableParam = command.CreateParameter();
+        tableParam.ParameterName = "@table";
+        tableParam.Value = tableName;
+        command.Parameters.Add(tableParam);
+
+        var result = (int)(await command.ExecuteScalarAsync());
+        return result > 0;
     }
 }
