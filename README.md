@@ -1,3 +1,17 @@
+public class ColumnSchema
+{
+    public string COLUMN_NAME { get; set; }
+    public string DATA_TYPE { get; set; }
+    public int? CHARACTER_MAXIMUM_LENGTH { get; set; }
+    public int? NUMERIC_PRECISION { get; set; }
+}
+
+
+
+
+
+
+
 public class YourDbContext : DbContext
 {
     public YourDbContext(DbContextOptions<YourDbContext> options)
