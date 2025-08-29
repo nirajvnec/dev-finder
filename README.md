@@ -1,26 +1,54 @@
-DECLARE @schemaName NVARCHAR(50) = 'reference';
-DECLARE @tableName NVARCHAR(50) = 'mail_dl';
+public async Task<IEnumerable<TableEditorDataRow>> GetTableDataByTableNameAsync(string tableName)
+{
+    var result = new List<TableEditorDataRow>();
 
-SELECT 
-    c.COLUMN_NAME AS ColumnName,
-    c.DATA_TYPE AS DataType,
-    c.CHARACTER_MAXIMUM_LENGTH AS CharacterMaximumLength,
-    c.NUMERIC_PRECISION AS NumericPrecision,
-    CASE WHEN c.IS_NULLABLE = 'NO' THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END AS IsRequired,
-    CASE 
-        WHEN col.is_identity = 1 OR pk.column_id IS NOT NULL THEN CAST(1 AS bit) 
-        ELSE CAST(0 AS bit) 
-    END AS IsReadOnly
-FROM INFORMATION_SCHEMA.COLUMNS c
-JOIN sys.columns col 
-    ON col.object_id = OBJECT_ID(c.TABLE_SCHEMA + '.' + c.TABLE_NAME)
-    AND col.name = c.COLUMN_NAME
-LEFT JOIN sys.indexes i 
-    ON i.object_id = col.object_id 
-    AND i.is_primary_key = 1
-LEFT JOIN sys.index_columns pk
-    ON pk.object_id = col.object_id 
-    AND pk.column_id = col.column_id 
-    AND pk.index_id = i.index_id
-WHERE c.TABLE_SCHEMA = @schemaName 
-  AND c.TABLE_NAME = @tableName;
+    // Extract schema + table
+    var schema = "dbo"; 
+    var pureTableName = tableName;
+
+    if (tableName.Contains("."))
+    {
+        var parts = tableName.Split('.');
+        schema = parts[0];
+        pureTableName = parts[1];
+    }
+
+    // Validate table exists in schema
+    var exists = await _context
+        .Database
+        .ExecuteSqlInterpolatedAsync(
+            $"SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = {schema} AND TABLE_NAME = {pureTableName}");
+
+    if (exists == 0)
+        throw new ArgumentException($"Table '{schema}.{pureTableName}' does not exist.");
+
+    // Run query
+    using (var connection = _context.Database.GetDbConnection())
+    {
+        await connection.OpenAsync();
+
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = $"SELECT * FROM [{schema}].[{pureTableName}]";
+
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    var row = new TableEditorDataRow();
+
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        string columnName = reader.GetName(i);
+                        object value = await reader.IsDBNullAsync(i) ? null : reader.GetValue(i);
+                        row.Data[columnName] = value;
+                    }
+
+                    result.Add(row);
+                }
+            }
+        }
+    }
+
+    return result;
+}
