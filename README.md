@@ -1,35 +1,40 @@
-public async Task<IEnumerable<TableEditorDataRow>> GetTableDataByTableNameAsync(string tableName)
+using Microsoft.AspNetCore.Mvc;
+
+[ApiController]
+[Route("api/[controller]")]
+public class TableDataController : ControllerBase
 {
-    var result = new List<TableEditorDataRow>();
+    private readonly ITableEditorRepository _repository;
 
-    // Parse schema + table
-    var (schema, pureTableName) = tableName.SplitSchemaAndTable();
-
-    // Validate existence
-    if (!await _context.TableExistsAsync(schema, pureTableName))
-        throw new ArgumentException($"Table '{schema}.{pureTableName}' does not exist.");
-
-    // Query rows
-    using var connection = _context.Database.GetDbConnection();
-    await connection.OpenAsync();
-
-    using var command = connection.CreateCommand();
-    command.CommandText = $"SELECT * FROM [{schema}].[{pureTableName}]";
-
-    using var reader = await command.ExecuteReaderAsync();
-    while (await reader.ReadAsync())
+    public TableDataController(ITableEditorRepository repository)
     {
-        var row = new TableEditorDataRow();
-
-        for (int i = 0; i < reader.FieldCount; i++)
-        {
-            string columnName = reader.GetName(i);
-            object? value = await reader.IsDBNullAsync(i) ? null : reader.GetValue(i);
-            row.Data[columnName] = value;
-        }
-
-        result.Add(row);
+        _repository = repository;
     }
 
-    return result;
+    /// <summary>
+    /// Get all rows from a given table.
+    /// Pass "tableName" as "schema.table" (e.g. "reference.mail_dl").
+    /// </summary>
+    [HttpGet("{tableName}")]
+    public async Task<IActionResult> GetTableData(string tableName)
+    {
+        try
+        {
+            var data = await _repository.GetTableDataByTableNameAsync(tableName);
+
+            if (data == null || !data.Any())
+                return NotFound($"No data found in table {tableName}");
+
+            return Ok(data);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            // log ex in real-world apps
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
 }
