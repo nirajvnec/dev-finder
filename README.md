@@ -28,10 +28,9 @@ public async Task<IEnumerable<TableEditorDataRow>> GetTableDataByTableNameAsync(
 {
     var result = new List<TableEditorDataRow>();
 
-    // Extract schema + table
-    var schema = "dbo"; 
+    // Split schema + table
+    var schema = "dbo";
     var pureTableName = tableName;
-
     if (tableName.Contains("."))
     {
         var parts = tableName.Split('.');
@@ -39,16 +38,10 @@ public async Task<IEnumerable<TableEditorDataRow>> GetTableDataByTableNameAsync(
         pureTableName = parts[1];
     }
 
-    // Validate table exists in schema
-    var exists = await _context
-        .Database
-        .ExecuteSqlInterpolatedAsync(
-            $"SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = {schema} AND TABLE_NAME = {pureTableName}");
-
-    if (exists == 0)
+    // Use extension method
+    if (!await _context.TableExistsAsync(schema, pureTableName))
         throw new ArgumentException($"Table '{schema}.{pureTableName}' does not exist.");
 
-    // Run query
     using (var connection = _context.Database.GetDbConnection())
     {
         await connection.OpenAsync();
@@ -70,6 +63,14 @@ public async Task<IEnumerable<TableEditorDataRow>> GetTableDataByTableNameAsync(
                         row.Data[columnName] = value;
                     }
 
+                    result.Add(row);
+                }
+            }
+        }
+    }
+
+    return result;
+}
                     result.Add(row);
                 }
             }
