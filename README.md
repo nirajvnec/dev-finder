@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace YourNamespace.Controllers
@@ -15,12 +16,12 @@ namespace YourNamespace.Controllers
         }
 
         /// <summary>
-        /// Gets the schema of a table by name, including metadata and database info.
+        /// Get schema details for a specific table.
         /// </summary>
-        /// <param name="tableName">The name of the table to fetch schema info for.</param>
-        /// <returns>List of columns with schema and metadata info.</returns>
+        /// <param name="tableName">The table name.</param>
+        /// <returns>Enumerable of TableEditorColumnInfo</returns>
         [HttpGet("{tableName}")]
-        public async Task<IActionResult> GetTableSchema(string tableName)
+        public async Task<ActionResult<IEnumerable<TableEditorColumnInfo>>> GetTableSchema(string tableName)
         {
             if (string.IsNullOrWhiteSpace(tableName))
                 return BadRequest("Table name is required.");
@@ -36,12 +37,11 @@ namespace YourNamespace.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { Message = ex.Message });
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
-                // Log exception details for troubleshooting
-                return StatusCode(500, new { Message = "An unexpected error occurred.", Details = ex.Message });
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
     }
