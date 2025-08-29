@@ -1,48 +1,24 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+DECLARE @TableName SYSNAME = 'YourTableName';
 
-namespace YourNamespace.Controllers
-{
-    [ApiController]
-    [Route("api/[controller]")]
-    public class TableSchemaController : ControllerBase
-    {
-        private readonly ITableSchemaRepository _tableSchemaRepository;
-
-        public TableSchemaController(ITableSchemaRepository tableSchemaRepository)
-        {
-            _tableSchemaRepository = tableSchemaRepository;
-        }
-
-        /// <summary>
-        /// Get schema details for a specific table.
-        /// </summary>
-        /// <param name="tableName">The table name.</param>
-        /// <returns>Enumerable of TableEditorColumnInfo</returns>
-        [HttpGet("{tableName}")]
-        public async Task<ActionResult<IEnumerable<TableEditorColumnInfo>>> GetTableSchema(string tableName)
-        {
-            if (string.IsNullOrWhiteSpace(tableName))
-                return BadRequest("Table name is required.");
-
-            try
-            {
-                var schema = await _tableSchemaRepository.GetTableSchemaByTableNameAsync(tableName);
-
-                if (schema == null || !schema.Any())
-                    return NotFound($"No schema found for table '{tableName}'.");
-
-                return Ok(schema);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-    }
-}
+SELECT 
+    c.COLUMN_NAME AS ColumnName,
+    c.DATA_TYPE AS DataType,
+    c.CHARACTER_MAXIMUM_LENGTH AS CharacterMaximumLength,
+    c.NUMERIC_PRECISION AS NumericPrecision,
+    CASE WHEN c.IS_NULLABLE = 'NO' THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END AS IsRequired,
+    CASE 
+        WHEN col.is_identity = 1 OR pk.column_id IS NOT NULL THEN CAST(1 AS bit)
+        ELSE CAST(0 AS bit)
+    END AS IsReadOnly
+FROM INFORMATION_SCHEMA.COLUMNS c
+JOIN sys.columns col 
+    ON col.object_id = OBJECT_ID(c.TABLE_SCHEMA + '.' + c.TABLE_NAME)
+    AND col.name = c.COLUMN_NAME
+LEFT JOIN sys.indexes i 
+    ON i.object_id = col.object_id
+    AND i.is_primary_key = 1
+LEFT JOIN sys.index_columns pk
+    ON pk.object_id = col.object_id
+    AND pk.column_id = col.column_id
+    AND pk.index_id = i.index_id
+WHERE c.TABLE_NAME = @TableName;
