@@ -12,11 +12,11 @@ public class TableDataController : ControllerBase
     }
 
     /// <summary>
-    /// Get all rows from a given table.
-    /// Pass "tableName" as "schema.table" (e.g. "reference.mail_dl").
+    /// Get all rows from a given table (schema.table format).
+    /// Example: GET /api/tabledata/tableColumnData/reference.mail_dl
     /// </summary>
-    [HttpGet("{tableName}")]
-    public async Task<IActionResult> GetTableData(string tableName)
+    [HttpGet("tableColumnData/{tableName}")]
+    public async Task<IActionResult> GetTableColumnData(string tableName)
     {
         try
         {
@@ -33,7 +33,7 @@ public class TableDataController : ControllerBase
         }
         catch (Exception ex)
         {
-            // log ex in real-world apps
+            // Ideally log exception
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
