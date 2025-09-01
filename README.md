@@ -1,19 +1,11 @@
-public static class ReflectionHelper
+using System.Text.Json;
+using System.Threading.Tasks;
+
+public interface IGenericService
 {
-    public static async Task<object?> InvokeGenericAsync(
-        object target,
-        string methodName,
-        object?[] parameters)
-    {
-        var method = target.GetType().GetMethod(methodName);
-        if (method == null)
-            throw new InvalidOperationException($"Method '{methodName}' not found on {target.GetType()}");
-
-        var task = (Task)method.Invoke(target, parameters)!;
-        await task.ConfigureAwait(false);
-
-        // Handle Task<T> and Task
-        var resultProperty = task.GetType().GetProperty("Result");
-        return resultProperty != null ? resultProperty.GetValue(task) : null;
-    }
+    Task<object?> AddAsync(string entityName, JsonElement data);
+    Task<object?> UpdateAsync(string entityName, JsonElement data);
+    Task<bool> DeleteAsync(string entityName, int id);
+    Task<object?> GetByIdAsync(string entityName, int id);
+    Task<IEnumerable<object?>> GetAllAsync(string entityName);
 }
