@@ -1,39 +1,19 @@
-public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : class
+public static class ReflectionHelper
 {
-    private readonly DbContext _context;
-    private readonly DbSet<TEntity> _dbSet;
-
-    public GenericRepository(DbContext context)
+    public static async Task<object?> InvokeGenericAsync(
+        object target,
+        string methodName,
+        object?[] parameters)
     {
-        _context = context;
-        _dbSet = context.Set<TEntity>();
-    }
+        var method = target.GetType().GetMethod(methodName);
+        if (method == null)
+            throw new InvalidOperationException($"Method '{methodName}' not found on {target.GetType()}");
 
-    public async Task<TEntity> AddAsync(TEntity entity)
-    {
-        await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
-        return entity;
-    }
+        var task = (Task)method.Invoke(target, parameters)!;
+        await task.ConfigureAwait(false);
 
-    public async Task<TEntity?> GetByIdAsync(object id) => await _dbSet.FindAsync(id);
-
-    public async Task<IEnumerable<TEntity>> GetAllAsync() => await _dbSet.ToListAsync();
-
-    public async Task<TEntity> UpdateAsync(TEntity entity)
-    {
-        _dbSet.Update(entity);
-        await _context.SaveChangesAsync();
-        return entity;
-    }
-
-    public async Task DeleteAsync(object id)
-    {
-        var entity = await _dbSet.FindAsync(id);
-        if (entity != null)
-        {
-            _dbSet.Remove(entity);
-            await _context.SaveChangesAsync();
-        }
+        // Handle Task<T> and Task
+        var resultProperty = task.GetType().GetProperty("Result");
+        return resultProperty != null ? resultProperty.GetValue(task) : null;
     }
 }
