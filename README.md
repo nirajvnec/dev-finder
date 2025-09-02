@@ -1,14 +1,16 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System;
+using System.Linq;
+using System.Reflection;
 
-namespace Marvel.OperationalServices.Repositories
+namespace Marvel.OperationalServices.Common
 {
-    public interface IRepository
+    public static class ReflectionHelper
     {
-        Task<object?> GetByIdAsync(object id);
-        Task<IEnumerable<object>> GetAllAsync();
-        Task<object> AddAsync(object entity);
-        Task<object?> UpdateAsync(object id, object entity);
-        Task<bool> DeleteAsync(object id);
+        public static Type? GetEntityType(string entityName, Assembly entitiesAssembly)
+        {
+            return entitiesAssembly
+                .GetTypes()
+                .FirstOrDefault(t => t.Name.Equals(entityName, StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
