@@ -1,32 +1,15 @@
-using Marvel.OperationalServices.RepositoriesContract;
-using Microsoft.EntityFrameworkCore;
-using System;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
-namespace Marvel.OperationalServices.Factories
+namespace Marvel.OperationalServices.Services.Contracts
 {
-    public class RepositoryFactory : IRepositoryFactory
+    public interface IGenericService
     {
-        private readonly DbContext _context;
-
-        public RepositoryFactory(DbContext context)
-        {
-            _context = context;
-        }
-
-        public IRepository<TEntity> CreateRepository<TEntity>() where TEntity : class
-        {
-            return new Repository<TEntity>(_context);
-        }
-
-        public IRepository<object> CreateRepositoryByType(Type entityType)
-        {
-            // dynamically build generic Repository<T>
-            var repoType = typeof(Repository<>).MakeGenericType(entityType);
-
-            // Activator will resolve constructor injection with DbContext
-            var repository = Activator.CreateInstance(repoType, _context);
-
-            return (IRepository<object>)repository!;
-        }
+        Task<object> AddAsync(string entityName, JsonElement jsonData);
+        Task<object> UpdateAsync(string entityName, object id, JsonElement jsonData);
+        Task<bool> DeleteAsync(string entityName, object id);
+        Task<object?> GetByIdAsync(string entityName, object id);
+        Task<IEnumerable<object>> GetAllAsync(string entityName);
     }
 }
