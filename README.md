@@ -1,15 +1,14 @@
-using System.Text.Json;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Marvel.OperationalServices.Services.Contracts
+namespace Marvel.OperationalServices.Repositories
 {
-    public interface IGenericService
+    public interface IRepository
     {
-        Task<object> AddAsync(string entityName, JsonElement jsonData);
-        Task<object> UpdateAsync(string entityName, object id, JsonElement jsonData);
-        Task<bool> DeleteAsync(string entityName, object id);
-        Task<object?> GetByIdAsync(string entityName, object id);
-        Task<IEnumerable<object>> GetAllAsync(string entityName);
+        Task<object?> GetByIdAsync(object id);
+        Task<IEnumerable<object>> GetAllAsync();
+        Task<object> AddAsync(object entity);
+        Task<object?> UpdateAsync(object id, object entity);
+        Task<bool> DeleteAsync(object id);
     }
 }
