@@ -1,67 +1,38 @@
-using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Marvel.OperationalServices.Service;
-using Marvel.OperationalServices.Factory.Helpers; // if you have ReflectionHelper here
 
-namespace Marvel.OperationalServices.Factory
+namespace Marvel.OperationalServices.Service.Contracts
 {
-    public class ServiceFactory : IServiceFactory
+    /// <summary>
+    /// Defines a generic contract for service operations across all entities.
+    /// </summary>
+    /// <typeparam name="TEntity">Entity type</typeparam>
+    public interface IGenericService<TEntity> where TEntity : class
     {
-        private readonly IServiceProvider _serviceProvider;
+        /// <summary>
+        /// Retrieves all entities.
+        /// </summary>
+        Task<IEnumerable<TEntity>> GetAllAsync();
 
-        public ServiceFactory(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
+        /// <summary>
+        /// Retrieves an entity by its primary key.
+        /// </summary>
+        Task<TEntity?> GetByIdAsync(object id);
 
-        public object GetService(string entityName)
-        {
-            // Resolve entity type dynamically
-            var entityType = ReflectionHelper.GetEntityType(entityName);
-            if (entityType == null)
-                throw new InvalidOperationException($"Entity type '{entityName}' not found.");
+        /// <summary>
+        /// Creates a new entity from JSON input.
+        /// </summary>
+        Task<TEntity> CreateAsync(JsonElement jsonData);
 
-            // Construct GenericService<TEntity>
-            var serviceType = typeof(IGenericService<>).MakeGenericType(entityType);
+        /// <summary>
+        /// Updates an existing entity by id with JSON data.
+        /// </summary>
+        Task<TEntity?> UpdateAsync(object id, JsonElement jsonData);
 
-            var service = _serviceProvider.GetService(serviceType);
-            if (service == null)
-                throw new InvalidOperationException($"Service for '{entityName}' not registered.");
-
-            return service;
-        }
-
-        public async Task<object> CreateEntityAsync(string entityName, JsonElement jsonData)
-        {
-            var entityType = ReflectionHelper.GetEntityType(entityName);
-            if (entityType == null)
-                throw new InvalidOperationException($"Entity type '{entityName}' not found.");
-
-            // Deserialize JSON into entity object
-            var entity = JsonSerializer.Deserialize(jsonData.GetRawText(), entityType);
-            if (entity == null)
-                throw new InvalidOperationException($"Failed to deserialize JSON to '{entityName}'.");
-
-            // Resolve service
-            var serviceType = typeof(IGenericService<>).MakeGenericType(entityType);
-            var service = _serviceProvider.GetService(serviceType);
-
-            if (service == null)
-                throw new InvalidOperationException($"Service for '{entityName}' not registered.");
-
-            // Call GenericService<TEntity>.AddAsync(entity)
-            var method = serviceType.GetMethod("AddAsync");
-            if (method == null)
-                throw new InvalidOperationException($"AddAsync method not found on service '{serviceType.Name}'.");
-
-            var task = (Task)method.Invoke(service, new[] { entity })!;
-            await task.ConfigureAwait(false);
-
-            // Get Task.Result via reflection
-            var resultProperty = task.GetType().GetProperty("Result");
-            return resultProperty!.GetValue(task)!;
-        }
+        /// <summary>
+        /// Deletes an entity by id.
+        /// </summary>
+        Task<bool> DeleteAsync(object id);
     }
 }
