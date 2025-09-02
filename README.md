@@ -1,38 +1,36 @@
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Threading.Tasks;
+using System;
+using System.Linq;
+using System.Reflection;
 
-namespace Marvel.OperationalServices.Service.Contracts
+namespace Marvel.OperationalServices.Common.Helpers
 {
-    /// <summary>
-    /// Defines a generic contract for service operations across all entities.
-    /// </summary>
-    /// <typeparam name="TEntity">Entity type</typeparam>
-    public interface IGenericService<TEntity> where TEntity : class
+    public static class ReflectionHelper
     {
         /// <summary>
-        /// Retrieves all entities.
+        /// Gets the Type of an entity by its name using reflection.
         /// </summary>
-        Task<IEnumerable<TEntity>> GetAllAsync();
+        /// <param name="entityName">Name of the entity (case-insensitive, without namespace).</param>
+        /// <param name="assembly">Optional assembly where entities are defined. If null, searches all loaded assemblies.</param>
+        /// <returns>Entity Type if found, otherwise throws exception.</returns>
+        public static Type GetEntityType(string entityName, Assembly? assembly = null)
+        {
+            if (string.IsNullOrWhiteSpace(entityName))
+                throw new ArgumentException("Entity name cannot be null or empty", nameof(entityName));
 
-        /// <summary>
-        /// Retrieves an entity by its primary key.
-        /// </summary>
-        Task<TEntity?> GetByIdAsync(object id);
+            // Pick specific assembly if provided, else search in all
+            var assembliesToSearch = assembly != null
+                ? new[] { assembly }
+                : AppDomain.CurrentDomain.GetAssemblies();
 
-        /// <summary>
-        /// Creates a new entity from JSON input.
-        /// </summary>
-        Task<TEntity> CreateAsync(JsonElement jsonData);
+            // Try to find matching type
+            var entityType = assembliesToSearch
+                .SelectMany(a => a.GetTypes())
+                .FirstOrDefault(t => t.Name.Equals(entityName, StringComparison.OrdinalIgnoreCase));
 
-        /// <summary>
-        /// Updates an existing entity by id with JSON data.
-        /// </summary>
-        Task<TEntity?> UpdateAsync(object id, JsonElement jsonData);
+            if (entityType == null)
+                throw new InvalidOperationException($"Entity type '{entityName}' was not found in loaded assemblies.");
 
-        /// <summary>
-        /// Deletes an entity by id.
-        /// </summary>
-        Task<bool> DeleteAsync(object id);
+            return entityType;
+        }
     }
 }
