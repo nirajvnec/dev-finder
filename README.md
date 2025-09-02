@@ -1,14 +1,9 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System;
 
-namespace Marvel.OperationalServices.Repositories
+namespace Marvel.OperationalServices.Factories
 {
-    public interface IRepository
+    public interface IRepositoryFactory
     {
-        Task<object?> GetByIdAsync(object id);
-        Task<IEnumerable<object>> GetAllAsync();
-        Task<object> AddAsync(object entity);
-        Task<object?> UpdateAsync(object id, object entity);
-        Task<bool> DeleteAsync(object id);
+        IRepository CreateRepositoryByType(Type entityType);
     }
 }
