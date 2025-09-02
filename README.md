@@ -1,23 +1,39 @@
-using Microsoft.EntityFrameworkCore;
-using System;
-
-public class RepositoryFactory : IRepositoryFactory
+public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : class
 {
-    private readonly DbContext _dbContext;
+    private readonly DbContext _context;
+    private readonly DbSet<TEntity> _dbSet;
 
-    public RepositoryFactory(DbContext dbContext)
+    public GenericRepository(DbContext context)
     {
-        _dbContext = dbContext;
+        _context = context;
+        _dbSet = context.Set<TEntity>();
     }
 
-    public IRepository<TEntity> CreateRepository<TEntity>() where TEntity : class
+    public async Task<TEntity> AddAsync(TEntity entity)
     {
-        return new GenericRepository<TEntity>(_dbContext);
+        await _dbSet.AddAsync(entity);
+        await _context.SaveChangesAsync();
+        return entity;
     }
 
-    public object CreateRepositoryByType(Type entityType)
+    public async Task<TEntity?> GetByIdAsync(object id) => await _dbSet.FindAsync(id);
+
+    public async Task<IEnumerable<TEntity>> GetAllAsync() => await _dbSet.ToListAsync();
+
+    public async Task<TEntity> UpdateAsync(TEntity entity)
     {
-        var repoType = typeof(GenericRepository<>).MakeGenericType(entityType);
-        return Activator.CreateInstance(repoType, _dbContext)!;
+        _dbSet.Update(entity);
+        await _context.SaveChangesAsync();
+        return entity;
+    }
+
+    public async Task DeleteAsync(object id)
+    {
+        var entity = await _dbSet.FindAsync(id);
+        if (entity != null)
+        {
+            _dbSet.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
     }
 }
