@@ -1,8 +1,5 @@
-if (!string.IsNullOrEmpty(report.ReportStatus))
+if (!string.IsNullOrEmpty(report.ReportStatus) &&
+    (report.ReportStatus == "Draft" || report.ReportStatus == "Pending"))
 {
-    if (report.ReportStatus.Equals("Draft", StringComparison.OrdinalIgnoreCase) ||
-        report.ReportStatus.Equals("Pending", StringComparison.OrdinalIgnoreCase))
-    {
-        report.SendForApproval = false;
-    }
+    report.SendForApproval = false;
 }
