@@ -1,2 +1,3 @@
-dotnet add package Microsoft.EntityFrameworkCore
-dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+dotnet add package Microsoft.EntityFrameworkCore --version 8.0.11
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 8.0.11
+dotnet add package Microsoft.Extensions.Logging.Abstractions --version 8.0.2
