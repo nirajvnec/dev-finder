@@ -1,283 +1,114 @@
-// File 1: IEntityServiceFactory.cs
-using System.Text.Json;
+// File 1: IGenericRepository.cs
+namespace Marvel.DataHub.Repositories.Interfaces;
 
-namespace Marvel.OperationalServices.ApiHost.Services;
-
-public interface IEntityServiceFactory
+public interface IGenericRepository<TEntity, TKey> where TEntity : class
 {
-    Task<JsonElement?> GetByIdAsync(string entityName, string id);
-    Task<IEnumerable<JsonElement>> GetAllAsync(string entityName);
-    Task<JsonElement> AddAsync(string entityName, JsonElement entity);
-    Task<JsonElement> UpdateAsync(string entityName, JsonElement entity);
-    Task<bool> DeleteAsync(string entityName, string id);
-    IEnumerable<string> GetSupportedEntityNames();
+    Task<TEntity?> GetByIdAsync(TKey id);
+    Task<IEnumerable<TEntity>> GetAllAsync();
+    Task<TEntity> AddAsync(TEntity entity);
+    Task<TEntity> UpdateAsync(TEntity entity);
+    Task<bool> DeleteAsync(TKey id);
 }
 
-// File 2: EntityServiceFactory.cs
-using System.Text.Json;
-using Marvel.OperationalServices.Business.Interfaces;
+// File 2: GenericRepository.cs
+using Marvel.DataHub.Repositories.Interfaces;
+using Marvel.DataHub.Repositories.Sql;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
-namespace Marvel.OperationalServices.ApiHost.Services;
+namespace Marvel.DataHub.Repositories.Implementations;
 
-public class EntityServiceFactory : IEntityServiceFactory
+public class GenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey> 
+    where TEntity : class
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IEntityTypeProvider _entityTypeProvider;
-    private readonly ILogger<EntityServiceFactory> _logger;
+    protected readonly MarvelDbContext _context;
+    protected readonly DbSet<TEntity> _dbSet;
+    protected readonly ILogger<GenericRepository<TEntity, TKey>> _logger;
 
-    public EntityServiceFactory(
-        IServiceProvider serviceProvider,
-        IEntityTypeProvider entityTypeProvider,
-        ILogger<EntityServiceFactory> logger)
+    public GenericRepository(MarvelDbContext context, ILogger<GenericRepository<TEntity, TKey>> logger)
     {
-        _serviceProvider = serviceProvider;
-        _entityTypeProvider = entityTypeProvider;
+        _context = context;
+        _dbSet = _context.Set<TEntity>();
         _logger = logger;
     }
 
-    public async Task<JsonElement?> GetByIdAsync(string entityName, string id)
+    public virtual async Task<TEntity?> GetByIdAsync(TKey id)
     {
-        ValidateEntityName(entityName);
-        ValidateId(id);
-
         try
         {
-            _logger.LogInformation("Getting {EntityName} with ID {Id}", entityName, id);
-
-            var service = GetGenericService(entityName);
-            var method = service.GetType().GetMethod("GetByIdAsync");
-            
-            if (method == null)
-                throw new InvalidOperationException($"GetByIdAsync method not found for {entityName}");
-
-            var task = (Task)method.Invoke(service, new object[] { id })!;
-            await task;
-
-            var resultProperty = task.GetType().GetProperty("Result");
-            var result = resultProperty?.GetValue(task);
-            
-            if (result == null)
-            {
-                _logger.LogInformation("{EntityName} with ID {Id} not found", entityName, id);
-                return null;
-            }
-
-            var json = JsonSerializer.Serialize(result, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = false
-            });
-            
-            return JsonSerializer.Deserialize<JsonElement>(json);
+            _logger.LogInformation("Getting {EntityType} with ID {Id}", typeof(TEntity).Name, id);
+            return await _dbSet.FindAsync(id);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting {EntityName} with ID {Id}", entityName, id);
+            _logger.LogError(ex, "Error getting {EntityType} with ID {Id}", typeof(TEntity).Name, id);
             throw;
         }
     }
 
-    public async Task<IEnumerable<JsonElement>> GetAllAsync(string entityName)
+    public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
     {
-        ValidateEntityName(entityName);
-
         try
         {
-            _logger.LogInformation("Getting all {EntityName} entities", entityName);
-
-            var service = GetGenericService(entityName);
-            var method = service.GetType().GetMethod("GetAllAsync");
-            
-            if (method == null)
-                throw new InvalidOperationException($"GetAllAsync method not found for {entityName}");
-
-            var task = (Task)method.Invoke(service, Array.Empty<object>())!;
-            await task;
-
-            var resultProperty = task.GetType().GetProperty("Result");
-            var result = (IEnumerable<object>)(resultProperty?.GetValue(task) ?? Array.Empty<object>());
-
-            return result.Select(entity =>
-            {
-                var json = JsonSerializer.Serialize(entity, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    WriteIndented = false
-                });
-                return JsonSerializer.Deserialize<JsonElement>(json);
-            });
+            _logger.LogInformation("Getting all {EntityType} entities", typeof(TEntity).Name);
+            return await _dbSet.ToListAsync();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting all {EntityName} entities", entityName);
+            _logger.LogError(ex, "Error getting all {EntityType} entities", typeof(TEntity).Name);
             throw;
         }
     }
 
-    public async Task<JsonElement> AddAsync(string entityName, JsonElement entity)
+    public virtual async Task<TEntity> AddAsync(TEntity entity)
     {
-        ValidateEntityName(entityName);
-        ValidateEntity(entity);
-
         try
         {
-            _logger.LogInformation("Adding new {EntityName} entity", entityName);
-
-            var service = GetGenericService(entityName);
-            var entityType = _entityTypeProvider.GetEntityType(entityName)!;
-            
-            var deserializedEntity = JsonSerializer.Deserialize(entity.GetRawText(), entityType);
-            
-            if (deserializedEntity == null)
-                throw new InvalidOperationException($"Failed to deserialize {entityName} entity");
-
-            var method = service.GetType().GetMethod("AddAsync");
-            if (method == null)
-                throw new InvalidOperationException($"AddAsync method not found for {entityName}");
-
-            var task = (Task)method.Invoke(service, new[] { deserializedEntity })!;
-            await task;
-
-            var resultProperty = task.GetType().GetProperty("Result");
-            var result = resultProperty?.GetValue(task);
-
-            if (result == null)
-                throw new InvalidOperationException($"Failed to add {entityName} entity");
-
-            var json = JsonSerializer.Serialize(result, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = false
-            });
-            
-            return JsonSerializer.Deserialize<JsonElement>(json);
+            _logger.LogInformation("Adding new {EntityType} entity", typeof(TEntity).Name);
+            var result = await _dbSet.AddAsync(entity);
+            await _context.SaveChangesAsync();
+            return result.Entity;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error adding {EntityName} entity", entityName);
+            _logger.LogError(ex, "Error adding {EntityType} entity", typeof(TEntity).Name);
             throw;
         }
     }
 
-    public async Task<JsonElement> UpdateAsync(string entityName, JsonElement entity)
+    public virtual async Task<TEntity> UpdateAsync(TEntity entity)
     {
-        ValidateEntityName(entityName);
-        ValidateEntity(entity);
-
         try
         {
-            _logger.LogInformation("Updating {EntityName} entity", entityName);
-
-            var service = GetGenericService(entityName);
-            var entityType = _entityTypeProvider.GetEntityType(entityName)!;
-            
-            var deserializedEntity = JsonSerializer.Deserialize(entity.GetRawText(), entityType);
-            
-            if (deserializedEntity == null)
-                throw new InvalidOperationException($"Failed to deserialize {entityName} entity");
-
-            var method = service.GetType().GetMethod("UpdateAsync");
-            if (method == null)
-                throw new InvalidOperationException($"UpdateAsync method not found for {entityName}");
-
-            var task = (Task)method.Invoke(service, new[] { deserializedEntity })!;
-            await task;
-
-            var resultProperty = task.GetType().GetProperty("Result");
-            var result = resultProperty?.GetValue(task);
-
-            if (result == null)
-                throw new InvalidOperationException($"Failed to update {entityName} entity");
-
-            var json = JsonSerializer.Serialize(result, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = false
-            });
-            
-            return JsonSerializer.Deserialize<JsonElement>(json);
+            _logger.LogInformation("Updating {EntityType} entity", typeof(TEntity).Name);
+            _dbSet.Update(entity);
+            await _context.SaveChangesAsync();
+            return entity;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating {EntityName} entity", entityName);
+            _logger.LogError(ex, "Error updating {EntityType} entity", typeof(TEntity).Name);
             throw;
         }
     }
 
-    public async Task<bool> DeleteAsync(string entityName, string id)
+    public virtual async Task<bool> DeleteAsync(TKey id)
     {
-        ValidateEntityName(entityName);
-        ValidateId(id);
-
         try
         {
-            _logger.LogInformation("Deleting {EntityName} with ID {Id}", entityName, id);
+            _logger.LogInformation("Deleting {EntityType} with ID {Id}", typeof(TEntity).Name, id);
+            var entity = await GetByIdAsync(id);
+            if (entity == null) 
+                return false;
 
-            var service = GetGenericService(entityName);
-            var method = service.GetType().GetMethod("DeleteAsync");
-            
-            if (method == null)
-                throw new InvalidOperationException($"DeleteAsync method not found for {entityName}");
-
-            var task = (Task)method.Invoke(service, new object[] { id })!;
-            await task;
-
-            var resultProperty = task.GetType().GetProperty("Result");
-            var result = resultProperty?.GetValue(task);
-
-            return result is bool success && success;
+            _dbSet.Remove(entity);
+            await _context.SaveChangesAsync();
+            return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting {EntityName} with ID {Id}", entityName, id);
+            _logger.LogError(ex, "Error deleting {EntityType} with ID {Id}", typeof(TEntity).Name, id);
             throw;
         }
-    }
-
-    public IEnumerable<string> GetSupportedEntityNames()
-    {
-        return _entityTypeProvider.GetRegisteredEntityNames();
-    }
-
-    private object GetGenericService(string entityName)
-    {
-        var entityType = _entityTypeProvider.GetEntityType(entityName);
-        if (entityType == null)
-            throw new ArgumentException($"Unknown entity type: {entityName}");
-
-        var keyType = _entityTypeProvider.GetKeyType(entityName);
-        var serviceType = typeof(IGenericService<,>).MakeGenericType(entityType, keyType);
-        
-        var service = _serviceProvider.GetRequiredService(serviceType);
-        if (service == null)
-            throw new InvalidOperationException($"Service not registered for {entityName}");
-
-        return service;
-    }
-
-    private void ValidateEntityName(string entityName)
-    {
-        if (string.IsNullOrWhiteSpace(entityName))
-            throw new ArgumentException("Entity name cannot be null or empty", nameof(entityName));
-
-        if (_entityTypeProvider.GetEntityType(entityName) == null)
-        {
-            var supportedNames = string.Join(", ", _entityTypeProvider.GetRegisteredEntityNames());
-            throw new ArgumentException(
-                $"Entity type '{entityName}' is not supported. Supported types: {supportedNames}",
-                nameof(entityName));
-        }
-    }
-
-    private static void ValidateId(string id)
-    {
-        if (string.IsNullOrWhiteSpace(id))
-            throw new ArgumentException("ID cannot be null or empty", nameof(id));
-    }
-
-    private static void ValidateEntity(JsonElement entity)
-    {
-        if (entity.ValueKind == JsonValueKind.Null || entity.ValueKind == JsonValueKind.Undefined)
-            throw new ArgumentException("Entity cannot be null or undefined", nameof(entity));
     }
 }
