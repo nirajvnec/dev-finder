@@ -1,3 +1,6 @@
-dotnet add package Microsoft.EntityFrameworkCore --version 8.0.11
-dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 8.0.11
-dotnet add package Microsoft.Extensions.Logging.Abstractions --version 8.0.2
+public class GenericDbContext : DbContext  // Make sure this is correct
+{
+    public GenericDbContext(DbContextOptions<GenericDbContext> options) : base(options) { }
+    
+    public DbSet<MailDl> MailDls { get; set; }
+}
