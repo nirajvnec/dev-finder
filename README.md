@@ -1,75 +1,46 @@
-// File 1: IGenericService.cs
+// File 1: IEntityTypeProvider.cs
 namespace Marvel.OperationalServices.Business.Interfaces;
 
-public interface IGenericService<TEntity, TKey> where TEntity : class
+public interface IEntityTypeProvider
 {
-    Task<TEntity?> GetByIdAsync(TKey id);
-    Task<IEnumerable<TEntity>> GetAllAsync();
-    Task<TEntity> AddAsync(TEntity entity);
-    Task<TEntity> UpdateAsync(TEntity entity);
-    Task<bool> DeleteAsync(TKey id);
+    Type? GetEntityType(string entityName);
+    IEnumerable<string> GetRegisteredEntityNames();
+    Type GetKeyType(string entityName);
 }
 
-// File 2: GenericService.cs
+// File 2: EntityTypeProvider.cs
 using Marvel.OperationalServices.Business.Interfaces;
-using Marvel.DataHub.Repositories.Interfaces;
-using Microsoft.Extensions.Logging;
+using Marvel.DataHub.Entities;
 
 namespace Marvel.OperationalServices.Business.Services;
 
-public class GenericService<TEntity, TKey> : IGenericService<TEntity, TKey> 
-    where TEntity : class
+public class EntityTypeProvider : IEntityTypeProvider
 {
-    protected readonly IGenericRepository<TEntity, TKey> _repository;
-    protected readonly ILogger<GenericService<TEntity, TKey>> _logger;
+    private readonly Dictionary<string, (Type EntityType, Type KeyType)> _entityTypes;
 
-    public GenericService(
-        IGenericRepository<TEntity, TKey> repository,
-        ILogger<GenericService<TEntity, TKey>> logger)
+    public EntityTypeProvider()
     {
-        _repository = repository;
-        _logger = logger;
+        _entityTypes = new Dictionary<string, (Type EntityType, Type KeyType)>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "product", (typeof(Product), typeof(string)) },
+            { "car", (typeof(Car), typeof(string)) },
+            { "vehicle", (typeof(Vehicle), typeof(string)) },
+            { "football", (typeof(Football), typeof(string)) }
+        };
     }
 
-    public virtual async Task<TEntity?> GetByIdAsync(TKey id)
+    public Type? GetEntityType(string entityName)
     {
-        if (id == null)
-            throw new ArgumentNullException(nameof(id));
-
-        _logger.LogInformation("Service: Getting {EntityType} with ID {Id}", typeof(TEntity).Name, id);
-        return await _repository.GetByIdAsync(id);
+        return _entityTypes.TryGetValue(entityName, out var types) ? types.EntityType : null;
     }
 
-    public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
+    public Type GetKeyType(string entityName)
     {
-        _logger.LogInformation("Service: Getting all {EntityType} entities", typeof(TEntity).Name);
-        return await _repository.GetAllAsync();
+        return _entityTypes.TryGetValue(entityName, out var types) ? types.KeyType : typeof(string);
     }
 
-    public virtual async Task<TEntity> AddAsync(TEntity entity)
+    public IEnumerable<string> GetRegisteredEntityNames()
     {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
-
-        _logger.LogInformation("Service: Adding new {EntityType} entity", typeof(TEntity).Name);
-        return await _repository.AddAsync(entity);
-    }
-
-    public virtual async Task<TEntity> UpdateAsync(TEntity entity)
-    {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
-
-        _logger.LogInformation("Service: Updating {EntityType} entity", typeof(TEntity).Name);
-        return await _repository.UpdateAsync(entity);
-    }
-
-    public virtual async Task<bool> DeleteAsync(TKey id)
-    {
-        if (id == null)
-            throw new ArgumentNullException(nameof(id));
-
-        _logger.LogInformation("Service: Deleting {EntityType} with ID {Id}", typeof(TEntity).Name, id);
-        return await _repository.DeleteAsync(id);
+        return _entityTypes.Keys;
     }
 }
