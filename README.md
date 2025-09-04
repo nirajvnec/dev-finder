@@ -1,14 +1,2 @@
-public static class EntityHelper
-{
-    public static string GetIdFromEntity(JsonElement entity)
-    {
-        if (entity.TryGetProperty("mailDlKey", out JsonElement mailDlKeyElement))
-            return mailDlKeyElement.ToString();
-        if (entity.TryGetProperty("id", out JsonElement idElement))
-            return idElement.ToString();
-        if (entity.TryGetProperty("Id", out JsonElement upperIdElement))
-            return upperIdElement.ToString();
-        
-        return string.Empty;
-    }
-}
+dotnet add package FluentValidation --version 12.0.0
+dotnet add package FluentValidation.DependencyInjectionExtensions --version 12.0.0
