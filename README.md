@@ -1,12 +1,2 @@
-, MailDlValidator>();
-
-// Register specific service (not generic service)
-builder.Services.AddScoped<IMailDlService, MailDlService>();
-
-// Still need repository
-builder.Services.AddScoped<IGenericRepository<MailDl, int>, GenericRepository<MailDl, int>>();
-*
-
-
-/ Register validator
-builder.Services.AddScoped<IValidator<MailDl>, MailDlValidator>();
+dotnet add package Microsoft.EntityFrameworkCore --version 8.0.11
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 8.0.11
