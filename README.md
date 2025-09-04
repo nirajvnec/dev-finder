@@ -3,7 +3,7 @@ namespace Marvel.OperationalServices.ApiHost.Services;
 
 public interface IEmailService
 {
-    string? GetUserEmail();
+    Task<string?> GetUserEmailAsync();
 }
 
 // File 2: EmailService.cs
@@ -22,7 +22,7 @@ public class EmailService : IEmailService
         _logger = logger;
     }
 
-    public string? GetUserEmail()
+    public async Task<string?> GetUserEmailAsync()
     {
         try
         {
@@ -44,18 +44,18 @@ public class EmailService : IEmailService
                         var email = jsonToken?.Claims.FirstOrDefault(c => c.Type == "upn")?.Value;
                         
                         _logger.LogDebug("Retrieved user email: {Email}", email);
-                        return email ?? "Unknown";
+                        return await Task.FromResult(email ?? "Unknown");
                     }
                 }
             }
             
             _logger.LogWarning("No valid bearer token found");
-            return null;
+            return await Task.FromResult<string?>(null);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving user email from token");
-            return null;
+            return await Task.FromResult<string?>(null);
         }
     }
 }
