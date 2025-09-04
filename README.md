@@ -7,7 +7,7 @@ public interface IEmailService
 }
 
 // File 2: EmailService.cs
-using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Marvel.OperationalServices.ApiHost.Services;
 
@@ -26,24 +26,35 @@ public class EmailService : IEmailService
     {
         try
         {
-            var user = _httpContextAccessor.HttpContext?.User;
-            if (user?.Identity?.IsAuthenticated != true)
-            {
-                _logger.LogWarning("User is not authenticated");
-                return null;
-            }
-
-            // Try different claim types for email
-            var email = user.FindFirst(ClaimTypes.Email)?.Value ?? 
-                       user.FindFirst("email")?.Value ?? 
-                       user.FindFirst("preferred_username")?.Value;
+            var request = _httpContextAccessor.HttpContext?.Request;
             
-            _logger.LogDebug("Retrieved user email: {Email}", email);
-            return email;
+            if (request != null && request.Headers.ContainsKey("Authorization"))
+            {
+                var authHeader = request.Headers["Authorization"].ToString();
+                
+                if (!string.IsNullOrWhiteSpace(authHeader) && 
+                    authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    var bearerToken = authHeader.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
+                    var handler = new JwtSecurityTokenHandler();
+                    
+                    if (handler.CanReadToken(bearerToken))
+                    {
+                        var jsonToken = handler.ReadToken(bearerToken) as JwtSecurityToken;
+                        var email = jsonToken?.Claims.FirstOrDefault(c => c.Type == "upn")?.Value;
+                        
+                        _logger.LogDebug("Retrieved user email: {Email}", email);
+                        return email ?? "Unknown";
+                    }
+                }
+            }
+            
+            _logger.LogWarning("No valid bearer token found");
+            return null;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving user email");
+            _logger.LogError(ex, "Error retrieving user email from token");
             return null;
         }
     }
