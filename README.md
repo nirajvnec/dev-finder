@@ -6,3 +6,7 @@ builder.Services.AddScoped<IMailDlService, MailDlService>();
 // Still need repository
 builder.Services.AddScoped<IGenericRepository<MailDl, int>, GenericRepository<MailDl, int>>();
 *
+
+
+/ Register validator
+builder.Services.AddScoped<IValidator<MailDl>, MailDlValidator>();
